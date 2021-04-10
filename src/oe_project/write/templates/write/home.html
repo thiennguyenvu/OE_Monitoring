@@ -1,0 +1,270 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/general.css' %}">
+{% endblock head %}
+{% block body %}
+<div>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+            {% if 'safe' in message.tags %} {{ message|safe }}
+            {% else %} {{ message }} {% endif %}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+<div>
+    <form id="form-line" name="form-line" action="" method="POST">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="table-responsive">
+                    <table class="table table-history table-arm">
+                        <thead>
+                            <tr>
+                                <th colspan="2">ARM</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="arm-a">
+                                    <button name="arm-a" type="button" disabled>Line A</button>
+                                </td>
+                                <td class="arm-b">
+                                    <button name="arm-b" type="button" disabled>Line B</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="arm-c">
+                                    <button name="arm-c" type="button" disabled>Line C</button>
+                                </td>
+                                <td class="arm-d">
+                                    <button name="arm-d" type="button" disabled>Line D</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="arm-e">
+                                    <button name="arm-e" type="button" disabled>Line E</button>
+                                </td>
+                                <td class="arm-f">
+                                    <button name="arm-f" type="button" disabled>Line F</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="arm-j">
+                                    <button name="arm-j" type="button" disabled>Line J</button>
+                                </td>
+                                <td class=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="table-responsive">
+                    <table class="table table-history table-ass">
+                        <thead>
+                            <tr>
+                                <th colspan="2">ASS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="ass-a">
+                                    <button name="ass-a" type="button" disabled>Line A</button>
+                                </td>
+                                <td class="ass-b">
+                                    <button name="ass-b" type="button" disabled>Line B</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ass-c">
+                                    <button name="ass-c" type="button" disabled>Line C</button>
+                                </td>
+                                <td class="ass-d">
+                                    <button name="ass-d" type="button" disabled>Line D</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ass-e">
+                                    <button name="ass-e" type="button" disabled>Line E</button>
+                                </td>
+                                <td class="ass-f">
+                                    <button name="ass-f" type="button" disabled>Line F</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="ass-j">
+                                    <button name="ass-j" type="button" disabled>Line J</button>
+                                </td>
+                                <td class=""></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="output-data"></div>
+{% endblock body %}
+{% block script %}
+<script>
+    jQuery(function ($) {
+        var ajax_call = function () {
+            $.ajax({
+                url: '',
+                type: 'get',
+                success: function (response) {
+                    $('.tbl-arm-a').empty();
+                    $('.tbl-arm-a').append(response.data.tbl_arm_a);
+                    $('.tbl-arm-b').empty();
+                    $('.tbl-arm-b').append(response.data.tbl_arm_b);
+                    $('.tbl-arm-c').empty();
+                    $('.tbl-arm-c').append(response.data.tbl_arm_c);
+                    $('.tbl-arm-d').empty();
+                    $('.tbl-arm-d').append(response.data.tbl_arm_d);
+                    $('.tbl-arm-e').empty();
+                    $('.tbl-arm-e').append(response.data.tbl_arm_e);
+                    $('.tbl-arm-f').empty();
+                    $('.tbl-arm-f').append(response.data.tbl_arm_f);
+                    $('.tbl-arm-j').empty();
+                    $('.tbl-arm-j').append(response.data.tbl_arm_j);
+
+                    $('.tbl-ass-a').empty();
+                    $('.tbl-ass-a').append(response.data.tbl_ass_a);
+                    $('.tbl-ass-b').empty();
+                    $('.tbl-ass-b').append(response.data.tbl_ass_b);
+                    $('.tbl-ass-c').empty();
+                    $('.tbl-ass-c').append(response.data.tbl_ass_c);
+                    $('.tbl-ass-d').empty();
+                    $('.tbl-ass-d').append(response.data.tbl_ass_d);
+                    $('.tbl-ass-e').empty();
+                    $('.tbl-ass-e').append(response.data.tbl_ass_e);
+                    $('.tbl-ass-f').empty();
+                    $('.tbl-ass-f').append(response.data.tbl_ass_f);
+                    $('.tbl-ass-j').empty();
+                    $('.tbl-ass-j').append(response.data.tbl_ass_j);
+
+                    // Red alarm
+                    if ($('.stt-True-False')[0]) {
+                        setInterval(function () {
+                            $('.stt-True-False').fadeOut(100);
+                            $('.stt-True-False').fadeIn(100);
+                        }, 100);
+                        var alertAudio = new Audio('{% static "sound/Bleep-Sound.mp3" %}');
+                        alertAudio.play();
+                    };
+
+                    if (response.data.tbl_arm_a) {
+                        $('.arm-a button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_arm_b) {
+                        $('.arm-b button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_arm_c) {
+                        $('.arm-c button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_arm_d) {
+                        $('.arm-d button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_arm_e) {
+                        $('.arm-e button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_arm_f) {
+                        $('.arm-f button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_arm_j) {
+                        $('.arm-j button').removeAttr('disabled').addClass('enabled');
+                    }
+
+                    if (response.data.tbl_ass_a) {
+                        $('.ass-a button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_ass_b) {
+                        $('.ass-b button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_ass_c) {
+                        $('.ass-c button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_ass_d) {
+                        $('.ass-d button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_ass_e) {
+                        $('.ass-e button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_ass_f) {
+                        $('.ass-f button').removeAttr('disabled').addClass('enabled');
+                    }
+                    if (response.data.tbl_ass_j) {
+                        $('.ass-j button').removeAttr('disabled').addClass('enabled');
+                    }
+                },
+            });
+        };
+        var interval = 3000;
+        setInterval(ajax_call, interval);
+
+        // arm
+        $('.arm-a button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-arm-a row"></div>');
+        });
+        $('.arm-b button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-arm-b row"></div>');
+        });
+        $('.arm-c button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-arm-c row"></div>');
+        });
+        $('.arm-d button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-arm-d row"></div>');
+        });
+        $('.arm-e button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-arm-e row"></div>');
+        });
+        $('.arm-f button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-arm-f row"></div>');
+        });
+        $('.arm-j button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-arm-j row"></div>');
+        });
+
+        // ass
+        $('.ass-a button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-ass-a row"></div>');
+        });
+        $('.ass-b button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-ass-b row"></div>');
+        });
+        $('.ass-c button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-ass-c row"></div>');
+        });
+        $('.ass-d button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-ass-d row"></div>');
+        });
+        $('.ass-e button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-ass-e row"></div>');
+        });
+        $('.ass-f button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-ass-f row"></div>');
+        });
+        $('.ass-j button').click(function () {
+            $('.output-data').empty();
+            $('.output-data').append('<div class="tbl-ass-j row"></div>');
+        });
+    });
+</script>
+{% endblock script %}

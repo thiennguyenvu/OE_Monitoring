@@ -1,0 +1,94 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/general.css' %}">
+{% endblock head %}
+{% block body %}
+<div style="display: flex;">
+    <div class="col-md-12">
+        <form id="form-plan" name="form-plan" method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-8">
+                    <fieldset>
+                        <legend>Information Requirement</legend>
+                        <label for="id_department">Department: </label>
+                        <select id="id_department" name="department" required>
+                            <option value="" class="opt-empty"></option>
+                            {% for department in departments %}
+                            <option value="{{ department }}">
+                                {{ department }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <br />
+                        <label for="id_line">Line: </label>
+                        <select id="id_line" name="line" required>
+                            <option value="" class="opt-empty"></option>
+                            {% for line in lines %}
+                            <option value="{{ line }}">
+                                {{ line }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <br />
+                        <label for="id_dj_group_model">Model: </label>
+                        <select id="id_dj_group_model" name="dj_group_model" required>
+                            <option value="" class="opt-empty"></option>
+                            {% for item in dj_group_models %}
+                            <option value="{{ item.name }}">{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <br />
+                        <label for="plan">Q'ty Plan: </label>
+                        <input id="plan" name="plan" type="number" min="1" step="1" required />
+                        <br />
+                        <label for="version">Version of plan: </label>
+                        <input id="version" name="version" type="number" min="1" step="1" required />
+                        <br />
+                        <label for="check-shift">3rd shift: </label>
+                        <input id="check-shift" name="check-shift" type="checkbox" />
+                        <br />
+                    </fieldset>
+                </div>
+
+                <div id="div-button" class="col-md-4">
+                    <button id="btn-plan" name="btn-plan" type="submit" disabled>
+                        Create Plan
+                    </button>
+                    <div class="note">
+                        <b>Note:</b>
+                        <p>Please fill information to create plan</p>
+                    </div>
+                    {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                        <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>
+                            {% if 'safe' in message.tags %} {{ message|safe }}
+                            {% else %} {{ message }} {% endif %}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock body %}
+{% block script %}
+<script>
+    jQuery(function ($) {
+        // Detect user fill input
+        $('#version').on('input', function () {
+            $version = $('#version').val();
+            if ($version === '') {
+                $('#div-button button').attr('disabled', true);
+                $('.note').fadeIn(600);
+            } else {
+                $('#div-button button').removeAttr('disabled');
+                $('.note').fadeOut(600);
+            }
+        });
+    });
+</script>
+{% endblock script %}

@@ -1,0 +1,77 @@
+/* Logo responsive */
+#dj-logo {
+  width: 12%;
+  margin: 0px 30px;
+}
+@media only screen and (max-width: 767px) {
+  #dj-logo {
+    width: 50%;
+  }
+}
+/* Hide hello user on top navbar */
+@media only screen and (max-width: 992px) {
+  .nav-link.display-name {
+    display: none;
+  }
+}
+
+/* Custom color status messages  */
+.messages .success {
+  background-color: rgba(0, 255, 0, 0.2);
+  border: 3px solid rgba(0, 255, 0, 1);
+  margin: 5px;
+  width: fit-content;
+}
+.messages .error {
+  background-color: rgba(255, 0, 0, 0.2);
+  border: 3px solid rgba(255, 0, 0, 1);
+  margin: 5px;
+  width: fit-content;
+}
+.messages .warning {
+  background-color: rgba(255, 255, 0, 0.2);
+  border: 3px solid rgba(255, 255, 0, 1);
+  margin: 5px;
+  width: fit-content;
+}
+
+/* General Text Settings */
+.text-highlight {
+  font-style: italic;
+  font-size: 14px;
+}
+
+/* Profile Page */
+#profiles-form fieldset {
+  border: 1px groove #ddd;
+  padding: 0 25px 25px 25px;
+}
+#profiles-form legend {
+  width: inherit;
+  padding: 0 10px;
+  border-bottom: none;
+}
+#profiles-form label {
+  display: inline-block;
+  width: 100px;
+  margin: 10px 0px;
+}
+
+.user-avatar {
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+}
+
+svg.user-avatar {
+  width: 120px !important;
+}
+
+.profile-head {
+  text-align: center;
+  width: 100%;
+}
+
+.profile-bio #id_bio {
+  height: 100px;
+}

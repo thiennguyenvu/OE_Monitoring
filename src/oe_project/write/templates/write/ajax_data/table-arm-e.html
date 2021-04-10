@@ -1,0 +1,83 @@
+{% for idx, val in dict_arm_e.items %}
+<div class="col-md-6">
+    <table class="table tbl-{{ val.department }} tbl-{{ val.department }}-{{ val.line }}">
+        <thead>
+            <tr>
+                <td class="data-status">
+                    <i class="fas fa-signal stt-{{ val.start }}"></i>
+                </td>
+                <th class="data-line" colspan="3">
+                    {{ val.department }}-{{ val.line }}
+                    <div>{{ val.model_name }}</div>
+                </th>
+                <th class="data-date" colspan="2">
+                    {{ val.date }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="row-time">
+                <td class="data-time start-time-label">Start Time</td>
+                <td class="data-time start-time-value">
+                    {{ val.start_time }}
+                </td>
+                <td class="data-time end-time-label">End Time</td>
+                <td class="data-time end-time-value">
+                    {{ val.end_time }}
+                </td>
+                <td colspan="2" rowspan="3" class="data-model">
+                    {{ val.model_group }}<br />plan:
+                    {{ val.version }}
+                </td>
+            </tr>
+            <tr class="row-plan">
+                <td class="data-label qty-plan-label">Q'ty Plan</td>
+                <td class="data-value qty-plan-value">
+                    {{ val.qty_plan }}
+                </td>
+                <td class="data-label st-plan-label">ST Plan</td>
+                <td class="data-value st-plan-value">{{ val.st_plan }}</td>
+            </tr>
+            <tr class="row-actual">
+                <td class="data-label qty-actual-label">Q'ty Actual</td>
+                <td class="data-value qty-actual-value">{{ val.qty_actual }}</td>
+                <td class="data-label st-actual-label">ST Actual</td>
+                <td class="data-value st-actual-value">{{ val.st_actual }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="progress-bar-done" data-done="{{ val.per_finish }}">
+                        <div class="data-finish data-label per-finish-label">Finish</div>
+                        <div class="data-finish data-value per-finish-value">{{ val.per_finish }} %</div>
+                    </div>
+                </td>
+                <td>
+                    <p><b style="font-size: 18px">Machine</b></p>
+                    <i class="fas fa-circle stt-{{ val.start }}-{{ val.machine }}"></i>
+                </td>
+                <td>
+                    <p><b style="font-size: 18px">Material</b></p>
+                    <i class="fas fa-circle stt-{{ val.start }}-{{ val.material }}"></i>
+                </td>
+                <td>
+                    <p><b style="font-size: 18px">Quality</b></p>
+                    <i class="fas fa-circle stt-{{ val.start }}-{{ val.quality }}"></i>
+                </td>
+                <td>
+                    <p><b style="font-size: 18px">Other</b></p>
+                    <i class="fas fa-circle stt-{{ val.start }}-{{ val.other }}"></i>
+                </td>
+            </tr>
+        </tbody>
+        <script>
+            var progress = document.querySelectorAll('.tbl-ARM .progress-bar-done');
+            var index = parseInt('{{ idx }}');
+            var per_finish = progress[index].getAttribute('data-done');
+
+            if (per_finish > 100) per_finish = 100;
+            progress[index].style.width = per_finish + '%';
+            progress[index].style.opacity = 1;
+        </script>
+    </table>
+</div>
+{% endfor %}

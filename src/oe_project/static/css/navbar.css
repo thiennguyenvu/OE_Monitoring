@@ -1,0 +1,14 @@
+.dropdown-item span.label, .nav-item span.label{
+    margin: 0px 10px;
+}
+@media only screen and (max-width: 992px) {
+  .nav-item.dropdown.ml-auto {
+    margin-left: unset !important;
+  }
+}
+
+.navbar-profile-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50px; 
+}

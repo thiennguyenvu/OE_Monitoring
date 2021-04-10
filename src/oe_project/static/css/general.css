@@ -1,0 +1,282 @@
+form {
+  border: none;
+}
+
+/* Message style */
+.message {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Label, input settings */
+#form-plan label,
+#form-history label,
+.table-history label {
+  display: inline-block;
+  width: 100px;
+  margin: 5px 0px;
+  font-size: 13px;
+}
+
+.output-data label {
+  display: inline-block;
+  width: 75px;
+  margin: 8px 0px;
+  font-size: 13px;
+}
+
+.output-data input {
+  width: 70px;
+}
+
+.opt-empty {
+  display: none;
+}
+
+/* Form settings */
+#form-plan fieldset,
+#form-history fieldset {
+  border: 1px groove #ddd;
+  padding: 0 25px 25px 25px;
+}
+
+#form-plan legend,
+#form-history legend {
+  width: inherit;
+  padding: 0 10px;
+  border-bottom: none;
+}
+
+/* Button settings */
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+#div-button {
+  padding-top: 5px;
+}
+
+#div-button button:disabled {
+  background-color: #ddd;
+}
+
+#btn-history {
+  display: none;
+}
+
+.btn-red {
+  background-color: #d34246;
+}
+
+.btn-yellow {
+  background-color: #ffd075;
+}
+
+/* Table settings */
+table,
+th,
+td {
+  border: 1px solid black;
+}
+
+table.table-history {
+  margin-top: 15px;
+  border: 1px groove #ddd;
+}
+
+.table-history button {
+  padding: 3px;
+}
+
+.table-history button:disabled {
+  background-color: #ddd;
+}
+
+.table-history th,
+.table-history tr,
+.table-history td {
+  text-align: center;
+  /* border: 1px groove #ddd; */
+}
+
+.table-history > tbody > tr > td,
+.table-history > tbody > tr > th,
+.table-history > tfoot > tr > td,
+.table-history > tfoot > tr > th,
+.table-history > thead > tr > td,
+.table-history > thead > tr > th {
+  padding: 0px 8px;
+}
+
+.table-history td.disabled {
+  color: #d3d3d3;
+}
+
+.output-data table {
+  border: 5px solid black;
+  text-align: center;
+}
+
+.output-data table > tbody > tr > td,
+.output-data table > tbody > tr > th,
+.output-data table > tfoot > tr > td,
+.output-data table > tfoot > tr > th,
+.output-data table > thead > tr > td,
+.output-data table > thead > tr > th {
+  vertical-align: middle;
+  padding: 8px 0px;
+}
+
+.output-data .data-model {
+  font-weight: bold;
+  background-color: #ffffa3;
+  font-size: 40px;
+  margin-top: 10px;
+  border: 1px solid #000;
+  min-width: 200px;
+}
+
+.output-data .data-status {
+  background-color: #fff;
+}
+
+.output-data .data-line {
+  font-size: 35px;
+  padding-left: 15px;
+  text-align: center;
+  background-color: #1877f2;
+  color: #fff;
+  font-weight: bold;
+}
+
+.output-data .data-date {
+  font-size: 25px;
+  text-align: right;
+  padding-right: 15px;
+  background-color: #fff;
+  color: green;
+  font-weight: bold;
+}
+
+.output-data .data-label {
+  border: 1px solid #000;
+  font-weight: bold;
+  padding: 10px;
+  text-align: left;
+  font-size: 20px;
+  border-right: none;
+}
+
+.output-data .data-value {
+  border: 1px solid #000;
+  font-weight: bold;
+  font-size: 40px;
+  min-width: 180px;
+}
+
+.output-data .data-time {
+  font-size: 16px;
+  font-weight: bold;
+  border: 1px solid #000;
+}
+
+/* table row background-color */
+.row-time{
+  background-color: #d3d3d3;
+}
+
+.row-plan{
+  background-color: #84A8E9;
+}
+
+.row-actual{
+  background-color: #fcf1b1;
+}
+
+.data-finish {
+  border: none !important;
+}
+
+.output-data .block-align {
+  padding: 8px 0px;
+  text-align: center;
+}
+
+/* space table */
+.output-data table.tbl-arm,
+.output-data table.tbl-ass {
+  margin-bottom: 50px;
+}
+
+/* Color status */
+.output-data .stt-False,
+.output-data .stt-False-False,
+.output-data .stt-False-True {
+  color: #d3d3d3;
+}
+
+.output-data .stt-True {
+  color: #0f7a48;
+}
+
+.output-data .stt-True-True {
+  color: #4caf50;
+}
+
+.output-data .stt-True-False {
+  color: #d34246;
+}
+
+.fa-circle {
+  font-size: 30px;
+}
+
+.fa-signal {
+  font-size: 40px;
+}
+
+/* Hide create plan on mobile */
+@media only screen and (max-width: 767px) {
+  .hide-on-mobile {
+    display: none;
+  }
+}
+
+/* Hide all data table */
+.tbl-arm-a,
+.tbl-arm-b,
+.tbl-arm-c,
+.tbl-arm-d,
+.tbl-arm-e,
+.tbl-arm-f,
+.tbl-arm-j,
+.tbl-ass-a,
+.tbl-ass-b,
+.tbl-ass-c,
+.tbl-ass-d,
+.tbl-ass-e,
+.tbl-ass-f,
+.tbl-ass-j {
+}
+
+/* Progress bar color */
+.progress-bar-done {
+  margin: -8px 0px;
+  background: linear-gradient(to left, #4FC08D, #DBF2E8);
+  height: 100%;
+  width: 0;
+  /* opacity: 0; */
+  transition: 1s ease 0.3s;
+}
