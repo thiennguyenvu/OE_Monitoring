@@ -2,7 +2,6 @@
 {% load static %}
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/general.css' %}">
-<link rel="stylesheet" href="{% static 'js/anime.min.js' %}">
 {% endblock head %}
 {% block body %}
 <div>
@@ -108,12 +107,18 @@
         </div>
     </form>
 </div>
+{% include 'write/child_template/output-table.html' %}
 {% include 'write/child_template/output-canvas.html' %}
-
 {% endblock body %}
 {% block script %}
+<script src="{% static 'js/anime.min.js' %}"></script>
 <script>
     jQuery(function ($) {
+        anime({
+            targets: '.tbl-ARM',
+            translateX: 250,
+        });
+
         var ajax_call = function () {
             $.ajax({
                 url: '',
@@ -160,47 +165,47 @@
                     };
                     console.log(response.data.canvas_arm_c);
 
-                    if (response.data.tbl_arm_a) {
+                    if (response.data.canvas_arm_a) {
                         $('.arm-a button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_arm_b) {
+                    if (response.data.canvas_arm_b) {
                         $('.arm-b button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_arm_c) {
+                    if (response.data.canvas_arm_c) {
                         $('.arm-c button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_arm_d) {
+                    if (response.data.canvas_arm_d) {
                         $('.arm-d button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_arm_e) {
+                    if (response.data.canvas_arm_e) {
                         $('.arm-e button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_arm_f) {
+                    if (response.data.canvas_arm_f) {
                         $('.arm-f button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_arm_j) {
+                    if (response.data.canvas_arm_j) {
                         $('.arm-j button').removeAttr('disabled').addClass('enabled');
                     }
 
-                    if (response.data.tbl_ass_a) {
+                    if (response.data.canvas_ass_a) {
                         $('.ass-a button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_ass_b) {
+                    if (response.data.canvas_ass_b) {
                         $('.ass-b button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_ass_c) {
+                    if (response.data.canvas_ass_c) {
                         $('.ass-c button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_ass_d) {
+                    if (response.data.canvas_ass_d) {
                         $('.ass-d button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_ass_e) {
+                    if (response.data.canvas_ass_e) {
                         $('.ass-e button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_ass_f) {
+                    if (response.data.canvas_ass_f) {
                         $('.ass-f button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.tbl_ass_j) {
+                    if (response.data.canvas_ass_j) {
                         $('.ass-j button').removeAttr('disabled').addClass('enabled');
                     }
                 },
