@@ -279,6 +279,96 @@ def get_arr_history(selected_plan):
     return arr
 
 
+def get_arr_last_model(plan): # Get latest data (calculate st with previous st)
+    arr = []
+    if plan:
+        # Get all model in group model of this plan
+        selected_group = DJModel.objects.filter(group__name=plan.group_model,
+                                                department__name=plan.department)
+        day = datetime.fromtimestamp(plan.timestamp).strftime(
+            '%Y-%m-%d 00:00:00.000000+00:00')
+        # Calculate for all model in selected group
+        for model in selected_group:
+            write_obj = WriteData.objects.filter(date=day, department__name=plan.department,
+                                                    line__name=plan.line, model=model,
+                                                    qty_plan=plan.qty_plan, version=plan.version)
+            if write_obj:
+                last_line = write_obj.last()
+                if len(write_obj) > 1:  # If found > 1 element in write object
+                    # Reverse object, get previous line of last line
+                    previous_line = write_obj.order_by('-id')[1]
+                else:
+                    previous_line = last_line
+                # Calculate fields
+                start_time = datetime.fromtimestamp(
+                    previous_line.timestamps).strftime('%H:%M:%S')
+                end_time = datetime.fromtimestamp(
+                    last_line.timestamps).strftime('%H:%M:%S')
+                per_finish = last_line.qty_actual / last_line.qty_plan * 100
+
+                delta_second = last_line.timestamps - previous_line.timestamps
+                # Calculate time of shift work
+                delta_second = calc_delta(delta_second, last_line.shift_work,
+                                            previous_line.timestamps, last_line.timestamps)
+
+                st_actual = 0
+                if last_line.qty_actual != 0:
+                    st_actual = delta_second
+                    data = {
+                        'start': last_line.start,
+                        'qty_actual': last_line.qty_actual,
+                        'timestamps': last_line.timestamps,
+                        'machine': last_line.machine,
+                        'material': last_line.material,
+                        'quality': last_line.quality,
+                        'other': last_line.other,
+                        'date': last_line.date.strftime('%Y-%m-%d'),
+                        'version': last_line.version,
+                        'shift_work': last_line.shift_work,
+                        'department': last_line.department.name,
+                        'line': last_line.line.name,
+                        'count_model_in_group': len(selected_group),
+                        'model_group': model.group.name,
+                        'model_name': model.description,
+                        'model_order': model.order,
+                        'st_plan': f"{model.st:.2f}",
+                        'qty_plan': last_line.qty_plan,
+
+                        'start_time': start_time,
+                        'end_time': end_time,
+                        'st_actual': f"{st_actual:.2f}",
+                        'per_finish': f"{per_finish:.2f}",
+                    }
+                else:
+                    data = {
+                        'start': False,
+                        'qty_actual': 0,
+                        'timestamps': last_line.timestamps,
+                        'machine': True,
+                        'material': True,
+                        'quality': True,
+                        'other': True,
+                        'date': last_line.date.strftime('%Y-%m-%d'),
+                        'version': last_line.version,
+                        'shift_work': last_line.shift_work,
+                        'department': last_line.department.name,
+                        'line': last_line.line.name,
+                        'count_model_in_group': len(selected_group),
+                        'model_group': model.group.name,
+                        'model_name': model.description,
+                        'model_order': model.order,
+                        'st_plan': '0.00',
+                        'qty_plan': 0,
+
+                        'start_time': '00:00:00',
+                        'end_time': '00:00:00',
+                        'st_actual': '0.00',
+                        'per_finish': '0.00',
+                    }
+                arr.append(data)
+    return arr
+
+
 def home(request):
     title = 'View'
     now_datetime = timezone.now().strftime(
@@ -706,174 +796,65 @@ def history(request):
         'json_ass_f': json.dumps(dict_ass_f),
         'json_ass_j': json.dumps(dict_ass_j),
     }
-    return render(request, 'write/history.html', context=context)
-
-
-def get_arr_last_model(selected_plan):
-    arr = []
-    if selected_plan:
-        # Get all plan of selected date
-        for plan in selected_plan:
-            # Get all model in group model of this plan
-            selected_group = DJModel.objects.filter(group__name=plan.group_model,
-                                                    department__name=plan.department)
-            day = datetime.fromtimestamp(plan.timestamp).strftime(
-                '%Y-%m-%d 00:00:00.000000+00:00')
-            # Calculate for all model in selected group
-            for model in selected_group:
-                write_obj = WriteData.objects.filter(date=day, department__name=plan.department,
-                                                     line__name=plan.line, model=model,
-                                                     qty_plan=plan.qty_plan, version=plan.version)
-                if write_obj:
-                    last_line = write_obj.last()
-                    if len(write_obj) > 1:  # If found > 1 element in write object
-                        # Reverse object, get previous line of last line
-                        previous_line = write_obj.order_by('-id')[1]
-                    else:
-                        previous_line = last_line
-                    # Calculate fields
-                    start_time = datetime.fromtimestamp(
-                        previous_line.timestamps).strftime('%H:%M:%S')
-                    end_time = datetime.fromtimestamp(
-                        last_line.timestamps).strftime('%H:%M:%S')
-                    per_finish = last_line.qty_actual / last_line.qty_plan * 100
-
-                    delta_second = last_line.timestamps - previous_line.timestamps
-                    # Calculate time of shift work
-                    delta_second = calc_delta(delta_second, last_line.shift_work,
-                                              previous_line.timestamps, last_line.timestamps)
-
-                    st_actual = 0
-                    if last_line.qty_actual != 0:
-                        st_actual = delta_second
-                        data = {
-                            'start': last_line.start,
-                            'qty_actual': last_line.qty_actual,
-                            'timestamps': last_line.timestamps,
-                            'machine': last_line.machine,
-                            'material': last_line.material,
-                            'quality': last_line.quality,
-                            'other': last_line.other,
-                            'date': last_line.date.strftime('%Y-%m-%d'),
-                            'version': last_line.version,
-                            'shift_work': last_line.shift_work,
-                            'department': last_line.department.name,
-                            'line': last_line.line.name,
-                            'model_group': model.group.name,
-                            'model_name': model.description,
-                            'model_order': model.order,
-                            'st_plan': f"{model.st:.2f}",
-                            'qty_plan': last_line.qty_plan,
-
-                            'start_time': start_time,
-                            'end_time': end_time,
-                            'st_actual': f"{st_actual:.2f}",
-                            'per_finish': f"{per_finish:.2f}",
-                        }
-                    else:
-                        data = {
-                            'start': False,
-                            'qty_actual': 0,
-                            'timestamps': last_line.timestamps,
-                            'machine': True,
-                            'material': True,
-                            'quality': True,
-                            'other': True,
-                            'date': last_line.date.strftime('%Y-%m-%d'),
-                            'version': last_line.version,
-                            'shift_work': last_line.shift_work,
-                            'department': last_line.department.name,
-                            'line': last_line.line.name,
-                            'model_group': model.group.name,
-                            'model_name': model.description,
-                            'model_order': model.order,
-                            'st_plan': '0.00',
-                            'qty_plan': 0,
-
-                            'start_time': '00:00:00',
-                            'end_time': '00:00:00',
-                            'st_actual': '0.00',
-                            'per_finish': '0.00',
-                        }
-                    arr.append(data)
-    return arr                
+    return render(request, 'write/history.html', context=context) 
 
 
 def animation(request):
     title = 'Animation'
 
-    # Default selected date
-    current_date = datetime.fromtimestamp(
-        datetime.timestamp(timezone.now()))
-    current_date_str = current_date.strftime('%Y-%m-%d')
-    selected_date = current_date_str
+    now_datetime = timezone.now().strftime(
+        '%Y-%m-%d 00:00:00.000000+00:00')
+    my_date = datetime.fromtimestamp(
+        datetime.timestamp(timezone.now())).strftime('%Y-%m-%d')
 
-    if request.method == 'POST':
-        if 'btn-history' in request.POST:
-            try:  # Validate data when user submit
-                user_submit_date = request.POST['date-history']
-                selected_date_obj = datetime(int(user_submit_date[:4]),
-                                             int(user_submit_date[5:7]),
-                                             int(user_submit_date[-2:]))
-                selected_date = selected_date_obj.strftime('%Y-%m-%d')
-            except:
-                pass
+    # Get plan of all line in current date
+    today_plan_arm_a = Planning.objects.filter(
+        date=my_date, department='ARM', line='A').last()
+    today_plan_arm_b = Planning.objects.filter(
+        date=my_date, department='ARM', line='B').last()
+    today_plan_arm_c = Planning.objects.filter(
+        date=my_date, department='ARM', line='C').last()
+    today_plan_arm_d = Planning.objects.filter(
+        date=my_date, department='ARM', line='D').last()
+    today_plan_arm_e = Planning.objects.filter(
+        date=my_date, department='ARM', line='E').last()
+    today_plan_arm_f = Planning.objects.filter(
+        date=my_date, department='ARM', line='F').last()
+    today_plan_arm_j = Planning.objects.filter(
+        date=my_date, department='ARM', line='J').last()
 
-            if selected_date == current_date.strftime('%Y-%m-%d'):
-                if current_date.hour < 6 and current_date.minute < 55:
-                    yesterday = current_date - timedelta(days=1)
-                    selected_date = datetime(yesterday.year,
-                                             yesterday.month,
-                                             yesterday.day).strftime('%Y-%m-%d')
-
-    selected_plan_arm_a = Planning.objects.filter(
-        date=selected_date, department='ARM', line='A')
-    selected_plan_arm_b = Planning.objects.filter(
-        date=selected_date, department='ARM', line='B')
-    selected_plan_arm_c = Planning.objects.filter(
-        date=selected_date, department='ARM', line='C')
-    selected_plan_arm_d = Planning.objects.filter(
-        date=selected_date, department='ARM', line='D')
-    selected_plan_arm_e = Planning.objects.filter(
-        date=selected_date, department='ARM', line='E')
-    selected_plan_arm_f = Planning.objects.filter(
-        date=selected_date, department='ARM', line='F')
-    selected_plan_arm_j = Planning.objects.filter(
-        date=selected_date, department='ARM', line='J')
-
-    selected_plan_ass_a = Planning.objects.filter(
-        date=selected_date, department='ASS', line='A')
-    selected_plan_ass_b = Planning.objects.filter(
-        date=selected_date, department='ASS', line='B')
-    selected_plan_ass_c = Planning.objects.filter(
-        date=selected_date, department='ASS', line='C')
-    selected_plan_ass_d = Planning.objects.filter(
-        date=selected_date, department='ASS', line='D')
-    selected_plan_ass_e = Planning.objects.filter(
-        date=selected_date, department='ASS', line='E')
-    selected_plan_ass_f = Planning.objects.filter(
-        date=selected_date, department='ASS', line='F')
-    selected_plan_ass_j = Planning.objects.filter(
-        date=selected_date, department='ASS', line='J')
+    today_plan_ass_a = Planning.objects.filter(
+        date=my_date, department='ASS', line='A').last()
+    today_plan_ass_b = Planning.objects.filter(
+        date=my_date, department='ASS', line='B').last()
+    today_plan_ass_c = Planning.objects.filter(
+        date=my_date, department='ASS', line='C').last()
+    today_plan_ass_d = Planning.objects.filter(
+        date=my_date, department='ASS', line='D').last()
+    today_plan_ass_e = Planning.objects.filter(
+        date=my_date, department='ASS', line='E').last()
+    today_plan_ass_f = Planning.objects.filter(
+        date=my_date, department='ASS', line='F').last()
+    today_plan_ass_j = Planning.objects.filter(
+        date=my_date, department='ASS', line='J').last()
 
     # ARM
-    arr_arm_a = get_arr_last_model(selected_plan_arm_a)
-    arr_arm_b = get_arr_last_model(selected_plan_arm_b)
-    arr_arm_c = get_arr_last_model(selected_plan_arm_c)
-    arr_arm_d = get_arr_last_model(selected_plan_arm_d)
-    arr_arm_e = get_arr_last_model(selected_plan_arm_e)
-    arr_arm_f = get_arr_last_model(selected_plan_arm_f)
-    arr_arm_j = get_arr_last_model(selected_plan_arm_j)
+    arr_arm_a = get_arr_last_model(today_plan_arm_a)
+    arr_arm_b = get_arr_last_model(today_plan_arm_b)
+    arr_arm_c = get_arr_last_model(today_plan_arm_c)
+    arr_arm_d = get_arr_last_model(today_plan_arm_d)
+    arr_arm_e = get_arr_last_model(today_plan_arm_e)
+    arr_arm_f = get_arr_last_model(today_plan_arm_f)
+    arr_arm_j = get_arr_last_model(today_plan_arm_j)
 
-    # # ASS
-    arr_ass_a = get_arr_last_model(selected_plan_ass_a)
-    arr_ass_b = get_arr_last_model(selected_plan_ass_b)
-    arr_ass_c = get_arr_last_model(selected_plan_ass_c)
-    arr_ass_d = get_arr_last_model(selected_plan_ass_d)
-    arr_ass_e = get_arr_last_model(selected_plan_ass_e)
-    arr_ass_f = get_arr_last_model(selected_plan_ass_f)
-    arr_ass_j = get_arr_last_model(selected_plan_ass_j)
-    print(arr_arm_c)
+    # ASS
+    arr_ass_a = get_arr_last_model(today_plan_ass_a)
+    arr_ass_b = get_arr_last_model(today_plan_ass_b)
+    arr_ass_c = get_arr_last_model(today_plan_ass_c)
+    arr_ass_d = get_arr_last_model(today_plan_ass_d)
+    arr_ass_e = get_arr_last_model(today_plan_ass_e)
+    arr_ass_f = get_arr_last_model(today_plan_ass_f)
+    arr_ass_j = get_arr_last_model(today_plan_ass_j)
 
     dict_arm_a = dict(zip([z for z in range(0, len(arr_arm_a))], arr_arm_a))
     dict_arm_b = dict(zip([z for z in range(0, len(arr_arm_b))], arr_arm_b))
@@ -891,13 +872,9 @@ def animation(request):
     dict_ass_f = dict(zip([z for z in range(0, len(arr_ass_f))], arr_ass_f))
     dict_ass_j = dict(zip([z for z in range(0, len(arr_ass_j))], arr_ass_j))
 
-    print(len(dict_arm_c))
-
     context = {
         'brand': brand,
         'title': title,
-        'selected_date': selected_date,
-        'current_date': current_date_str,
 
         'dict_arm_a': dict_arm_a,
         'dict_arm_b': dict_arm_b,
@@ -930,8 +907,44 @@ def animation(request):
         'json_ass_e': json.dumps(dict_ass_e),
         'json_ass_f': json.dumps(dict_ass_f),
         'json_ass_j': json.dumps(dict_ass_j),
-
-        'len_arm_c': len(dict_arm_c),
     }
+
+    if request.method == 'GET':
+        if request.is_ajax():
+            context_data = {
+                'dict_arm_a': dict_arm_a,
+                'dict_arm_b': dict_arm_b,
+                'dict_arm_c': dict_arm_c,
+                'dict_arm_d': dict_arm_d,
+                'dict_arm_e': dict_arm_e,
+                'dict_arm_f': dict_arm_f,
+                'dict_arm_j': dict_arm_j,
+
+                'dict_ass_a': dict_ass_a,
+                'dict_ass_b': dict_ass_b,
+                'dict_ass_c': dict_ass_c,
+                'dict_ass_d': dict_ass_d,
+                'dict_ass_e': dict_ass_e,
+                'dict_ass_f': dict_ass_f,
+                'dict_ass_j': dict_ass_j,
+            }
+            data = {
+                'canvas_arm_a': render_to_string('write/ajax_data/canvas-arm-a.html', context=context_data),
+                'canvas_arm_b': render_to_string('write/ajax_data/canvas-arm-b.html', context=context_data),
+                'canvas_arm_c': render_to_string('write/ajax_data/canvas-arm-c.html', context=context_data),
+                'canvas_arm_d': render_to_string('write/ajax_data/canvas-arm-d.html', context=context_data),
+                'canvas_arm_e': render_to_string('write/ajax_data/canvas-arm-e.html', context=context_data),
+                'canvas_arm_f': render_to_string('write/ajax_data/canvas-arm-f.html', context=context_data),
+                'canvas_arm_j': render_to_string('write/ajax_data/canvas-arm-j.html', context=context_data),
+
+                'canvas_ass_a': render_to_string('write/ajax_data/canvas-ass-a.html', context=context_data),
+                'canvas_ass_b': render_to_string('write/ajax_data/canvas-ass-b.html', context=context_data),
+                'canvas_ass_c': render_to_string('write/ajax_data/canvas-ass-c.html', context=context_data),
+                'canvas_ass_d': render_to_string('write/ajax_data/canvas-ass-d.html', context=context_data),
+                'canvas_ass_e': render_to_string('write/ajax_data/canvas-ass-e.html', context=context_data),
+                'canvas_ass_f': render_to_string('write/ajax_data/canvas-ass-f.html', context=context_data),
+                'canvas_ass_j': render_to_string('write/ajax_data/canvas-ass-j.html', context=context_data),
+            }
+            return JsonResponse({'data': data}, status=200)
 
     return render(request, 'write/animation.html', context=context)
