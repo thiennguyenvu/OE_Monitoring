@@ -12,7 +12,7 @@ class WriteData(models.Model):
     material = models.BooleanField(default=True)
     quality = models.BooleanField(default=True)
     other = models.BooleanField(default=True)
-    date = models.DateTimeField(default=now)
+    date = models.CharField(max_length=10)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True)
     line = models.ForeignKey(Line, on_delete=models.CASCADE, null=True)
     model = models.ForeignKey(DJModel, on_delete=models.CASCADE, null=True)

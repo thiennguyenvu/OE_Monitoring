@@ -77,7 +77,7 @@ def get_arr_group_model(today_plan):
         selected_group = DJModel.objects.filter(group__name=today_plan.group_model,
                                                 department__name=today_plan.department)
         day = datetime.fromtimestamp(today_plan.timestamp).strftime(
-            '%Y-%m-%d 00:00:00.000000+00:00')
+            '%Y-%m-%d')
 
         for model in selected_group:  # Loop through all models in group
             write_obj = WriteData.objects.filter(date=day, department__name=today_plan.department,
@@ -111,7 +111,7 @@ def get_arr_group_model(today_plan):
                         'material': last_line.material,
                         'quality': last_line.quality,
                         'other': last_line.other,
-                        'date': last_line.date.strftime('%Y-%m-%d'),
+                        'date': last_line.date,
                         'version': last_line.version,
                         'shift_work': last_line.shift_work,
                         'department': last_line.department.name,
@@ -135,7 +135,7 @@ def get_arr_group_model(today_plan):
                         'material': True,
                         'quality': True,
                         'other': True,
-                        'date': last_line.date.strftime('%Y-%m-%d'),
+                        'date': last_line.date,
                         'version': last_line.version,
                         'shift_work': last_line.shift_work,
                         'department': last_line.department.name,
@@ -203,7 +203,7 @@ def get_arr_history(selected_plan):
             selected_group = DJModel.objects.filter(group__name=plan.group_model,
                                                     department__name=plan.department)
             day = datetime.fromtimestamp(plan.timestamp).strftime(
-                '%Y-%m-%d 00:00:00.000000+00:00')
+                '%Y-%m-%d')
             # Calculate for all model in selected group
             for model in selected_group:
                 write_obj = WriteData.objects.filter(date=day, department__name=plan.department,
@@ -236,7 +236,7 @@ def get_arr_history(selected_plan):
                             'material': last_line.material,
                             'quality': last_line.quality,
                             'other': last_line.other,
-                            'date': last_line.date.strftime('%Y-%m-%d'),
+                            'date': last_line.date,
                             'version': last_line.version,
                             'shift_work': last_line.shift_work,
                             'department': last_line.department.name,
@@ -260,7 +260,7 @@ def get_arr_history(selected_plan):
                             'material': True,
                             'quality': True,
                             'other': True,
-                            'date': last_line.date.strftime('%Y-%m-%d'),
+                            'date': last_line.date,
                             'version': last_line.version,
                             'shift_work': last_line.shift_work,
                             'department': last_line.department.name,
@@ -279,7 +279,7 @@ def get_arr_history(selected_plan):
     return arr
 
 
-def get_arr_last_model(plan): # Get latest data (calculate st with previous st)
+def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
     arr = []
     if plan:
         # Get all model in group model of this plan
@@ -290,8 +290,8 @@ def get_arr_last_model(plan): # Get latest data (calculate st with previous st)
         # Calculate for all model in selected group
         for model in selected_group:
             write_obj = WriteData.objects.filter(date=day, department__name=plan.department,
-                                                    line__name=plan.line, model=model,
-                                                    qty_plan=plan.qty_plan, version=plan.version)
+                                                 line__name=plan.line, model=model,
+                                                 qty_plan=plan.qty_plan, version=plan.version)
             if write_obj:
                 last_line = write_obj.last()
                 if len(write_obj) > 1:  # If found > 1 element in write object
@@ -309,7 +309,7 @@ def get_arr_last_model(plan): # Get latest data (calculate st with previous st)
                 delta_second = last_line.timestamps - previous_line.timestamps
                 # Calculate time of shift work
                 delta_second = calc_delta(delta_second, last_line.shift_work,
-                                            previous_line.timestamps, last_line.timestamps)
+                                          previous_line.timestamps, last_line.timestamps)
 
                 st_actual = 0
                 if last_line.qty_actual != 0:
@@ -796,7 +796,7 @@ def history(request):
         'json_ass_f': json.dumps(dict_ass_f),
         'json_ass_j': json.dumps(dict_ass_j),
     }
-    return render(request, 'write/history.html', context=context) 
+    return render(request, 'write/history.html', context=context)
 
 
 def animation(request):
@@ -928,7 +928,9 @@ def animation(request):
                 'dict_ass_f': dict_ass_f,
                 'dict_ass_j': dict_ass_j,
             }
+
             data = {
+                'arm_a': dict_arm_a,
                 'canvas_arm_a': render_to_string('write/ajax_data/canvas-arm-a.html', context=context_data),
                 'canvas_arm_b': render_to_string('write/ajax_data/canvas-arm-b.html', context=context_data),
                 'canvas_arm_c': render_to_string('write/ajax_data/canvas-arm-c.html', context=context_data),
@@ -948,3 +950,204 @@ def animation(request):
             return JsonResponse({'data': data}, status=200)
 
     return render(request, 'write/animation.html', context=context)
+
+
+def check_plan(request):
+    title = 'Check Plan'
+
+    departments = Department.objects.all()
+    lines = Line.objects.all()
+    dj_group_models = DJGroupModel.objects.all()
+
+    my_plan = ''
+
+    if request.method == 'POST':
+        if 'btn-check-plan' in request.POST:
+            # Get data Plan form
+            my_timestamp = datetime.timestamp(timezone.now())
+            my_time = datetime.fromtimestamp(my_timestamp).strftime('%H:%M:%S')
+            my_date = datetime.fromtimestamp(my_timestamp).strftime('%Y-%m-%d')
+            # Custom date
+            current_date = datetime.fromtimestamp(my_timestamp)
+            if current_date.hour < 6 and current_date.minute < 55:
+                yesterday = current_date - timedelta(days=1)
+                my_date = datetime(yesterday.year, yesterday.month,
+                                   yesterday.day).strftime('%Y-%m-%d')
+
+            department = Department.objects.filter(
+                name=request.POST['department'])
+            if department:
+                department = request.POST['department']
+
+            line = Line.objects.filter(name=request.POST['line'])
+            if line:
+                line = request.POST['line']
+
+            dj_group_model = DJGroupModel.objects.filter(
+                name=request.POST['dj_group_model'])
+            if dj_group_model:
+                dj_group_model = request.POST['dj_group_model']
+
+            plan = ''
+            if str(request.POST['plan']).isnumeric():
+                plan = int(request.POST['plan'])
+                if plan == 0:
+                    plan = 1
+
+            version = ''
+            if str(request.POST['version']).isnumeric():
+                version = int(request.POST['version'])
+
+            shift_work = 0
+            if 'check-shift' in request.POST:
+                shift_work = 1
+
+            if department and line and dj_group_model and plan != '' and version != '':
+                # Check plan exists in database
+                plan_exists = Planning.objects.filter(date=my_date, department=department,
+                                                      line=line, group_model=dj_group_model,
+                                                      version=version, shift_work=shift_work,
+                                                      qty_plan=plan)
+
+                if plan_exists:
+                    my_plan = plan_exists.last()
+                    # messages.add_message(request, messages.SUCCESS, my_plan)
+                    # info = f"<style>table, th, td {{border: 1px solid black;}}\
+                    # li.safe.info{{margin-left:5px;}}</style><table><thead>\
+                    # <th>Department</th><th>Line</th><th>Model</th><th>Plan</th>\
+                    # <th>Version</th><th>3rd Shift</th></thead><tbody><tr>\
+                    # <td>{department}</td><td>{line}</td><td>{dj_group_model}</td>\
+                    # <td>{plan}</td><td>{version}</td><td>{shift_work}</td>\
+                    # </tr></tbody></table>"
+                    # messages.add_message(request, messages.INFO,
+                    #                      info, extra_tags='safe')
+                    # my_models = DJModel.objects.filter(department__name=department, group__name=dj_group_model)
+                    # print(my_models)
+
+                    return redirect('test_input', my_plan.id)
+
+                else:
+                    messages.add_message(
+                        request, messages.WARNING, 'Your PLAN request: ')
+                    info = f"<style>table, th, td {{border: 1px solid black;}}\
+                    li.safe.info{{margin-left:5px;}}</style><table><thead>\
+                    <th>Department</th><th>Line</th><th>Model</th><th>Plan</th>\
+                    <th>Version</th><th>3rd Shift</th></thead><tbody><tr>\
+                    <td>{department}</td><td>{line}</td><td>{dj_group_model}</td>\
+                    <td>{plan}</td><td>{version}</td><td>{shift_work}</td>\
+                    </tr></tbody></table>"
+                    messages.add_message(request, messages.INFO,
+                                         info, extra_tags='safe')
+
+                    messages.add_message(
+                        request, messages.ERROR, 'Not found this PLAN. Please check your information and try again.')
+
+    context = {
+        'brand': brand,
+        'title': title,
+        'departments': departments,
+        'lines': lines,
+        'dj_group_models': dj_group_models,
+        'my_plan': my_plan,
+    }
+
+    return render(request, 'write/check-plan.html', context=context)
+
+
+def test_input(request, pk_plan):
+    title = 'Test Input'
+    current_timestamp = datetime.timestamp(timezone.now())
+    current_date = datetime.fromtimestamp(current_timestamp)
+    current_date_str = current_date.strftime('%Y-%m-%d')
+
+    departments = Department.objects.all()
+    lines = Line.objects.all()
+    dj_group_models = DJGroupModel.objects.all()
+
+    my_plan = Planning.objects.get(id=pk_plan)
+    my_models = DJModel.objects.filter(
+        department__name=my_plan.department, group__name=my_plan.group_model)
+
+    if request.method == 'POST':
+        start = False
+        qty_actual = 0
+        timestamp = current_timestamp
+        machine = True
+        material = True
+        quality = True
+        other = True
+        date = my_plan.date
+        version = my_plan.version
+        shift_work = my_plan.shift_work
+        qty_plan = my_plan.qty_plan
+        department = Department.objects.get(name=my_plan.department)
+        line = Line.objects.get(name=my_plan.line)
+        model_id = request.POST['btn-model-id']
+
+        print(request.POST)
+        # Check exists
+        exists_data = WriteData.objects.filter(date=date, department=department,
+                                               line=line, model_id=model_id,
+                                               version=version, shift_work=shift_work,
+                                               qty_plan=qty_plan).last()
+        if exists_data:
+            start = exists_data.start
+            qty_actual = exists_data.qty_actual
+            machine = exists_data.machine
+            material = exists_data.material
+            quality = exists_data.quality
+            other = exists_data.other
+        else:
+            new_data = WriteData(start=start, qty_actual=qty_actual, timestamps=timestamp,
+                                 machine=machine, material=material, quality=quality,
+                                 other=other, date=date, version=version,
+                                 shift_work=shift_work, qty_plan=qty_plan,
+                                 department=department, line=line,
+                                 model_id=model_id)
+            new_data.save()
+
+            exists_data = WriteData.objects.get(date=date, department=department,
+                                                   line=line, model_id=model_id,
+                                                   version=version, shift_work=shift_work,
+                                                   qty_plan=qty_plan)
+
+        if 'btn-other' in request.POST:
+            other = not other
+        if 'btn-quality' in request.POST:
+            quality = not quality
+        if 'btn-material' in request.POST:
+            material = not material
+        if 'btn-machine' in request.POST:
+            machine = not machine
+        if 'btn-on-off' in request.POST:
+            start = not start
+
+        try:  # Validate qty_actual of user submit
+            qty_actual = request.POST['txt-qty-actual']
+            qty_actual = int(qty_actual)
+        except:
+            qty_actual = exists_data.qty_actual
+
+        print(qty_actual)
+
+        new_data = WriteData(start=start, qty_actual=qty_actual, timestamps=timestamp,
+                             machine=machine, material=material, quality=quality,
+                             other=other, date=date, version=version,
+                             shift_work=shift_work, qty_plan=qty_plan,
+                             department=department, line=line,
+                             model_id=model_id)
+        # print(qty_actual, timestamp, other, quality, material, machine, start,
+        #       date, version, shift_work, qty_plan, department, line, model_id)
+        new_data.save()
+
+    context = {
+        'brand': brand,
+        'title': title,
+        'departments': departments,
+        'lines': lines,
+        'dj_group_models': dj_group_models,
+        'my_plan': my_plan,
+        'my_models': my_models,
+    }
+
+    return render(request, 'write/test-input.html', context=context)

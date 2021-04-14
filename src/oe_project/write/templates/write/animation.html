@@ -2,6 +2,8 @@
 {% load static %}
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/general.css' %}">
+<link rel="stylesheet" href="{% static 'css/test.css' %}">
+<script src="{% static 'js/anime.min.js' %}"></script>
 {% endblock head %}
 {% block body %}
 <div>
@@ -107,25 +109,70 @@
         </div>
     </form>
 </div>
-{% include 'write/child_template/output-table.html' %}
+<!-- {% include 'write/child_template/output-table.html' %} -->
 {% include 'write/child_template/output-canvas.html' %}
+
+
+
+
+<!-- <div class="progress-line">
+    <span style="width: 100%;"></span>
+</div>
+
+<div id="page-wrap">
+    <h1>Progress Bars</h1>
+    <div class="meter">
+        <span style="width: 25%"></span>
+    </div>
+    <div class="meter orange nostripes">
+        <span style="width: 33.3%"></span>
+    </div>
+    <div class="meter red">
+        <span style="width: 80%"></span>
+    </div>
+    <div class="meter animate">
+        <span style="width: 50%"><span></span></span>
+    </div>
+</div> -->
+
+
 {% endblock body %}
 {% block script %}
-<script src="{% static 'js/anime.min.js' %}"></script>
 <script>
     jQuery(function ($) {
-        anime({
-            targets: '.tbl-ARM',
-            translateX: 250,
-        });
-
+        var pre_arm_a = [];
+        var current_arm_a = [];
+        var count = 0;
         var ajax_call = function () {
             $.ajax({
                 url: '',
                 type: 'get',
                 success: function (response) {
-                    $('.canvas-arm-a').empty();
-                    $('.canvas-arm-a').append(response.data.canvas_arm_a);
+                    for (var i = 0; i < response.data.arm_a[0].count_model_in_group; i++) {
+                        if (response.data.arm_a[i].st_actual) {
+                            current_arm_a[i] = response.data.arm_a[i].st_actual;
+                        }
+                    }
+                    
+                    if (JSON.stringify(current_arm_a) == JSON.stringify(pre_arm_a)) {
+                        console.log('Nothing change');
+                    }
+                    else {
+                        for (var i = 0; i < response.data.arm_a[0].count_model_in_group; i++) {
+                            if (response.data.arm_a[i].st_actual) {
+                                pre_arm_a[i] = response.data.arm_a[i].st_actual;
+                            }
+                        }
+
+                        localStorage.setItem('pre_arm_a', JSON.stringify(pre_arm_a));
+                        pre_arm_a = JSON.parse(localStorage.getItem('pre_arm_a'));
+
+                        $('.canvas-arm-a').empty();
+                        $('.canvas-arm-a').append(response.data.canvas_arm_a);
+                        console.log(pre_arm_a);
+                        console.log(current_arm_a);
+                    }
+
                     $('.canvas-arm-b').empty();
                     $('.canvas-arm-b').append(response.data.canvas_arm_b);
                     $('.canvas-arm-c').empty();
@@ -163,7 +210,7 @@
                         var alertAudio = new Audio('{% static "sound/Bleep-Sound.mp3" %}');
                         alertAudio.play();
                     };
-                    console.log(response.data.canvas_arm_c);
+                    //console.log(response.data.canvas_arm_c);
 
                     if (response.data.canvas_arm_a) {
                         $('.arm-a button').removeAttr('disabled').addClass('enabled');

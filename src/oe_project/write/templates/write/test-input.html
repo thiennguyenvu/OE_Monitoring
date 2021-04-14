@@ -1,0 +1,94 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/general.css' %}">
+{% endblock head %}
+{% block body %}
+<div>
+    <b>Note:</b> If your plan is a <b>new plan</b>, you need add <b>qty actual</b> first.
+</div>
+<div class="row">
+    <style>
+        .table-model {
+            border: 1px solid black;
+            margin: 50px 25px 0px;
+        }
+
+        .table-align:nth-child(odd) {
+            padding-left: 0px;
+        }
+
+        .table-align:nth-child(even) {
+            padding-right: 0px;
+        }
+    </style>
+    {% for model in my_models %}
+    <div class="col-md-6 table-align">
+        <form method='post'>
+            {% csrf_token %}
+            <div class="table-model">
+                <div class="row">
+                    <div class="col-md-4">
+                        Department - Line: <b>{{ my_plan.department }} - {{ my_plan.line }}</b>
+                    </div>
+                    <div class="col-md-8">
+                        Model: <b>{{ model.name }}-{{ model.description }}</b>
+                        <input id="btn-model-{{ model.id }}" type="hidden" class="btn-model-id" name="btn-model-id"
+                            value="{{ model.id }}">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Qty Plan: <b>{{ my_plan.qty_plan }}</b>
+                    </div>
+                    <div class="col-md-4">
+                        ST Plan: <b>{{ model.st }}</b>
+                    </div>
+                    <div class="col-md-4">
+                        Version: <b>{{ my_plan.version }}</b>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="txt-qty-actual">Input Qty actual: </label>
+                        <input type="number" min="1" id="txt-qty-actual" name="txt-qty-actual">
+                        <div class="col-md-3" style="display: inline-block;">
+                            <button class="btn-qty-actual" name="btn-qty-actual">
+                                Add Qty
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <button class="btn-other" name="btn-other">
+                            Other
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn-quality" name="btn-quality">
+                            Quality
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn-material" name="btn-material">
+                            Material
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn-machine" name="btn-machine">
+                            Machine
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn-on-off" name="btn-on-off">
+                            On/Off
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% endblock body %}
