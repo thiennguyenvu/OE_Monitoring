@@ -28,8 +28,8 @@ SECRET_KEY = 'kwsr+u650j4#wa0835*p83+!i(oh07u_rb@idm8g28dom8s67o'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-runserver.default_port = '8000'
-runserver.default_addr = '127.0.0.1'
+runserver.default_port = '9002'
+runserver.default_addr = '192.168.7.8'
 
 # Application definition
 
@@ -88,7 +88,7 @@ DATABASES = {
     'default': {
         'NAME': 'OE',
         'ENGINE': 'sql_server.pyodbc',
-        'HOST': 'LAPTOP-TNV',
+        'HOST': 'MMP',
         'USER': '',
         'PASSWORD': '',
         'OPTIONS': {

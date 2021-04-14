@@ -1011,19 +1011,6 @@ def check_plan(request):
 
                 if plan_exists:
                     my_plan = plan_exists.last()
-                    # messages.add_message(request, messages.SUCCESS, my_plan)
-                    # info = f"<style>table, th, td {{border: 1px solid black;}}\
-                    # li.safe.info{{margin-left:5px;}}</style><table><thead>\
-                    # <th>Department</th><th>Line</th><th>Model</th><th>Plan</th>\
-                    # <th>Version</th><th>3rd Shift</th></thead><tbody><tr>\
-                    # <td>{department}</td><td>{line}</td><td>{dj_group_model}</td>\
-                    # <td>{plan}</td><td>{version}</td><td>{shift_work}</td>\
-                    # </tr></tbody></table>"
-                    # messages.add_message(request, messages.INFO,
-                    #                      info, extra_tags='safe')
-                    # my_models = DJModel.objects.filter(department__name=department, group__name=dj_group_model)
-                    # print(my_models)
-
                     return redirect('test_input', my_plan.id)
 
                 else:
