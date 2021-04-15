@@ -1,1 +1,1 @@
-start cmd /k "cd E:\OE_Monitoring && oenv\Scripts\activate.bat && cd src\oe_project && python manage.py runserver"
+start cmd /k "oenv\Scripts\activate.bat && cd src\oe_project && python manage.py runserver"
