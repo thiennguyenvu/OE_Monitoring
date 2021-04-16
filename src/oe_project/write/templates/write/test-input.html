@@ -32,7 +32,7 @@
                         Department - Line: <b>{{ my_plan.department }} - {{ my_plan.line }}</b>
                     </div>
                     <div class="col-md-8">
-                        Model: <b>{{ model.name }}-{{ model.description }}</b>
+                        Model: <b>{{ model.group.description }}-{{ model.description }}</b>
                         <input id="btn-model-{{ model.id }}" type="hidden" class="btn-model-id" name="btn-model-id"
                             value="{{ model.id }}">
                     </div>
