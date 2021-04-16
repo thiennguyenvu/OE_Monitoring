@@ -31,7 +31,7 @@ class DJGroupModel(models.Model):
     description = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}-{self.description}"
 
 class DJModel(models.Model):
     name = models.CharField(max_length=100)
@@ -43,4 +43,4 @@ class DJModel(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}-{self.description}"
