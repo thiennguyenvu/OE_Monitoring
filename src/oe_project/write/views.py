@@ -1070,7 +1070,6 @@ def test_input(request, pk_plan):
         line = Line.objects.get(name=my_plan.line)
         model_id = request.POST['btn-model-id']
 
-        print(request.POST)
         # Check exists
         exists_data = WriteData.objects.filter(date=date, department=department,
                                                line=line, model_id=model_id,
@@ -1113,8 +1112,6 @@ def test_input(request, pk_plan):
             qty_actual = int(qty_actual)
         except:
             qty_actual = exists_data.qty_actual
-
-        print(qty_actual)
 
         new_data = WriteData(start=start, qty_actual=qty_actual, timestamps=timestamp,
                              machine=machine, material=material, quality=quality,
