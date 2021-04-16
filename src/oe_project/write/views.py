@@ -74,7 +74,7 @@ def get_arr_group_model(today_plan):
     arr = []
     if today_plan:
         # Get today group model
-        selected_group = DJModel.objects.filter(group__name=today_plan.group_model,
+        selected_group = DJModel.objects.filter(group__description=today_plan.group_model,
                                                 department__name=today_plan.department)
         day = datetime.fromtimestamp(today_plan.timestamp).strftime(
             '%Y-%m-%d')
@@ -116,7 +116,7 @@ def get_arr_group_model(today_plan):
                         'shift_work': last_line.shift_work,
                         'department': last_line.department.name,
                         'line': last_line.line.name,
-                        'model_group': model.group.name,
+                        'model_group': model.group.description,
                         'model_name': model.description,
                         'st_plan': f"{model.st:.2f}",
                         'qty_plan': last_line.qty_plan,
@@ -140,7 +140,7 @@ def get_arr_group_model(today_plan):
                         'shift_work': last_line.shift_work,
                         'department': last_line.department.name,
                         'line': last_line.line.name,
-                        'model_group': model.group.name,
+                        'model_group': model.group.description,
                         'model_name': model.description,
                         'st_plan': '0.00',
                         'qty_plan': 0,
@@ -159,7 +159,7 @@ def get_arr_plan(today_plan):
     arr = []
     if today_plan:
         # Get today group model
-        selected_group = DJModel.objects.filter(group__name=today_plan.group_model,
+        selected_group = DJModel.objects.filter(group__description=today_plan.group_model,
                                                 department__name=today_plan.department)
 
         for i in range(0, len(selected_group)):
@@ -177,10 +177,10 @@ def get_arr_plan(today_plan):
                 'Department': selected_group[i].department.id,
                 'Line Name': today_plan.line,
                 'Line': Line.objects.get(name=today_plan.line).id,
-                'Model Name': selected_group[i].name,
+                'Model Name': selected_group[i].description,
                 'Model': selected_group[i].id,
                 'Count Model In Group': len(selected_group),
-                'Model Group Name': selected_group[i].group.name,
+                'Model Group Name': selected_group[i].group.description,
                 'Model Group': selected_group[i].group.id,
                 'Version': today_plan.version,
                 'Shift Work': 1 if today_plan.shift_work else 0,
@@ -190,7 +190,6 @@ def get_arr_plan(today_plan):
                 'ST Actual': 0,
             }
             arr.append(data)
-
     return arr
 
 
@@ -200,8 +199,9 @@ def get_arr_history(selected_plan):
         # Get all plan of selected date
         for plan in selected_plan:
             # Get all model in group model of this plan
-            selected_group = DJModel.objects.filter(group__name=plan.group_model,
+            selected_group = DJModel.objects.filter(group__description=plan.group_model,
                                                     department__name=plan.department)
+        
             day = datetime.fromtimestamp(plan.timestamp).strftime(
                 '%Y-%m-%d')
             # Calculate for all model in selected group
@@ -241,7 +241,7 @@ def get_arr_history(selected_plan):
                             'shift_work': last_line.shift_work,
                             'department': last_line.department.name,
                             'line': last_line.line.name,
-                            'model_group': model.group.name,
+                            'model_group': model.group.description,
                             'model_name': model.description,
                             'st_plan': f"{model.st:.2f}",
                             'qty_plan': last_line.qty_plan,
@@ -265,7 +265,7 @@ def get_arr_history(selected_plan):
                             'shift_work': last_line.shift_work,
                             'department': last_line.department.name,
                             'line': last_line.line.name,
-                            'model_group': model.group.name,
+                            'model_group': model.group.description,
                             'model_name': model.description,
                             'st_plan': '0.00',
                             'qty_plan': 0,
@@ -283,7 +283,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
     arr = []
     if plan:
         # Get all model in group model of this plan
-        selected_group = DJModel.objects.filter(group__name=plan.group_model,
+        selected_group = DJModel.objects.filter(group__description=plan.group_model,
                                                 department__name=plan.department)
         day = datetime.fromtimestamp(plan.timestamp).strftime(
             '%Y-%m-%d 00:00:00.000000+00:00')
@@ -328,7 +328,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                         'department': last_line.department.name,
                         'line': last_line.line.name,
                         'count_model_in_group': len(selected_group),
-                        'model_group': model.group.name,
+                        'model_group': model.group.description,
                         'model_name': model.description,
                         'model_order': model.order,
                         'st_plan': f"{model.st:.2f}",
@@ -354,7 +354,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                         'department': last_line.department.name,
                         'line': last_line.line.name,
                         'count_model_in_group': len(selected_group),
-                        'model_group': model.group.name,
+                        'model_group': model.group.description,
                         'model_name': model.description,
                         'model_order': model.order,
                         'st_plan': '0.00',
@@ -538,7 +538,7 @@ def planning(request):
                 line = request.POST['line']
 
             dj_group_model = DJGroupModel.objects.filter(
-                name=request.POST['dj_group_model'])
+                description=request.POST['dj_group_model'])
             if dj_group_model:
                 dj_group_model = request.POST['dj_group_model']
 
@@ -653,8 +653,8 @@ def planning(request):
                 messages.add_message(
                     request, messages.WARNING, 'Submit invalid data.')
             # Export data to json file
-            with open(f"{path}active_lines.json", 'w+') as f:
-                json.dump(submit_data, f, indent=4)
+            with open(f"{path}active_lines.json", 'w+', encoding="utf-8") as f:
+                json.dump(submit_data, f, indent=4, ensure_ascii=False)
 
     context = {
         'brand': brand,
@@ -984,7 +984,7 @@ def check_plan(request):
                 line = request.POST['line']
 
             dj_group_model = DJGroupModel.objects.filter(
-                name=request.POST['dj_group_model'])
+                description=request.POST['dj_group_model'])
             if dj_group_model:
                 dj_group_model = request.POST['dj_group_model']
 
@@ -1053,7 +1053,7 @@ def test_input(request, pk_plan):
 
     my_plan = Planning.objects.get(id=pk_plan)
     my_models = DJModel.objects.filter(
-        department__name=my_plan.department, group__name=my_plan.group_model)
+        department__name=my_plan.department, group__description=my_plan.group_model)
 
     if request.method == 'POST':
         start = False
