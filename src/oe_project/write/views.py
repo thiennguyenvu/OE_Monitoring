@@ -78,14 +78,13 @@ def get_arr_group_model(today_plan):
                                                 department__name=today_plan.department)
         day = datetime.fromtimestamp(today_plan.timestamp).strftime(
             '%Y-%m-%d')
-
         for model in selected_group:  # Loop through all models in group
             write_obj = WriteData.objects.filter(date=day, department__name=today_plan.department,
                                                  line__name=today_plan.line, model=model)
             if write_obj:
                 last_line = write_obj.last()
                 first_line = (WriteData.objects.filter(date=last_line.date, department__name=last_line.department,
-                                                       line__name=last_line.line, model__name=last_line.model,
+                                                       line__name=last_line.line, model__name=last_line.model.name,
                                                        version=last_line.version, qty_plan=last_line.qty_plan))[0]
                 # Calculator fields
                 start_time = datetime.fromtimestamp(
@@ -201,7 +200,7 @@ def get_arr_history(selected_plan):
             # Get all model in group model of this plan
             selected_group = DJModel.objects.filter(group__description=plan.group_model,
                                                     department__name=plan.department)
-        
+
             day = datetime.fromtimestamp(plan.timestamp).strftime(
                 '%Y-%m-%d')
             # Calculate for all model in selected group
@@ -1094,9 +1093,9 @@ def test_input(request, pk_plan):
             new_data.save()
 
             exists_data = WriteData.objects.get(date=date, department=department,
-                                                   line=line, model_id=model_id,
-                                                   version=version, shift_work=shift_work,
-                                                   qty_plan=qty_plan)
+                                                line=line, model_id=model_id,
+                                                version=version, shift_work=shift_work,
+                                                qty_plan=qty_plan)
 
         if 'btn-other' in request.POST:
             other = not other
