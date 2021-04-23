@@ -285,7 +285,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
         selected_group = DJModel.objects.filter(group__description=plan.group_model,
                                                 department__name=plan.department)
         day = datetime.fromtimestamp(plan.timestamp).strftime(
-            '%Y-%m-%d 00:00:00.000000+00:00')
+            '%Y-%m-%d')
         # Calculate for all model in selected group
         for model in selected_group:
             write_obj = WriteData.objects.filter(date=day, department__name=plan.department,
@@ -293,6 +293,27 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                                                  qty_plan=plan.qty_plan, version=plan.version)
             if write_obj:
                 last_line = write_obj.last()
+                latest_obj = LatestData.objects.filter(date=last_line.date, department=last_line.department,
+                                                       line=last_line.line, model=last_line.model,
+                                                       qty_plan=last_line.qty_plan, version=last_line.version).last()
+                if latest_obj:
+                    print(latest_obj)
+                    if latest_obj.qty_actual != last_line.qty_actual \
+                            or latest_obj.start != last_line.start \
+                            or latest_obj.machine != last_line.machine \
+                            or latest_obj.material != last_line.material \
+                            or latest_obj.quality != last_line.quality \
+                            or latest_obj.other != last_line.other:
+                        print(last_line)
+                        print(latest_obj)
+                        print('Save')
+                    else:
+                        print('Duplicate')
+                else:
+                    latest_obj = last_line
+                    latest_obj.pk = None
+                    latest_obj.save()
+
                 if len(write_obj) > 1:  # If found > 1 element in write object
                     # Reverse object, get previous line of last line
                     previous_line = write_obj.order_by('-id')[1]
@@ -321,7 +342,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                         'material': last_line.material,
                         'quality': last_line.quality,
                         'other': last_line.other,
-                        'date': last_line.date.strftime('%Y-%m-%d'),
+                        'date': last_line.date,
                         'version': last_line.version,
                         'shift_work': last_line.shift_work,
                         'department': last_line.department.name,
@@ -347,7 +368,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                         'material': True,
                         'quality': True,
                         'other': True,
-                        'date': last_line.date.strftime('%Y-%m-%d'),
+                        'date': last_line.date,
                         'version': last_line.version,
                         'shift_work': last_line.shift_work,
                         'department': last_line.department.name,
@@ -800,9 +821,6 @@ def history(request):
 
 def animation(request):
     title = 'Animation'
-
-    now_datetime = timezone.now().strftime(
-        '%Y-%m-%d 00:00:00.000000+00:00')
     my_date = datetime.fromtimestamp(
         datetime.timestamp(timezone.now())).strftime('%Y-%m-%d')
 
@@ -871,6 +889,7 @@ def animation(request):
     dict_ass_f = dict(zip([z for z in range(0, len(arr_ass_f))], arr_ass_f))
     dict_ass_j = dict(zip([z for z in range(0, len(arr_ass_j))], arr_ass_j))
 
+    print(dict_arm_a)
     context = {
         'brand': brand,
         'title': title,
@@ -929,7 +948,6 @@ def animation(request):
             }
 
             data = {
-                'arm_a': dict_arm_a,
                 'canvas_arm_a': render_to_string('write/ajax_data/canvas-arm-a.html', context=context_data),
                 'canvas_arm_b': render_to_string('write/ajax_data/canvas-arm-b.html', context=context_data),
                 'canvas_arm_c': render_to_string('write/ajax_data/canvas-arm-c.html', context=context_data),
