@@ -1,9 +1,9 @@
 {% load static %}
+{% for idx, val in dict_arm_a.items %}
 <div class="col-md-2">
-    {% for idx, val in dict_arm_a.items %}
     <div class="model-box">
         <div class="model-tag-name"><b>{{ val.model_name }}</b></div>
-        
+
         <div class="arrow-line">
             <div class="st-pointer"></div>
         </div>
@@ -11,21 +11,13 @@
             <i class="arrow down"></i>
         </div>
     </div>
-
-    <!-- <div class="col-md-12">
-    <canvas id="myCanvas-{{val.department}}-{{val.line}}-{{idx}}"
-        class="canvas-{{ val.department }} canvas-{{ val.department }}-{{ val.line }}"
-        style="border: 1px solid #d3d3d3;">
-        Your browser does not support the HTML canvas tag.
-    </canvas>
-</div> -->
     <script>
         var st_arm_a = 0;
         var st_actual = parseFloat('{{ val.st_actual }}');
-        
-        if (st_arm_a != st_actual){
+
+        if (st_arm_a != st_actual) {
             st_arm_a = st_actual;
-            
+
 
             var delay_time = st_arm_a * 1000;
             var animation = anime({
@@ -43,5 +35,5 @@
 
         }
     </script>
-    {% endfor %}
 </div>
+{% endfor %}

@@ -109,32 +109,7 @@
         </div>
     </form>
 </div>
-<!-- {% include 'write/child_template/output-table.html' %} -->
 {% include 'write/child_template/output-canvas.html' %}
-
-
-
-
-<!-- <div class="progress-line">
-    <span style="width: 100%;"></span>
-</div>
-
-<div id="page-wrap">
-    <h1>Progress Bars</h1>
-    <div class="meter">
-        <span style="width: 25%"></span>
-    </div>
-    <div class="meter orange nostripes">
-        <span style="width: 33.3%"></span>
-    </div>
-    <div class="meter red">
-        <span style="width: 80%"></span>
-    </div>
-    <div class="meter animate">
-        <span style="width: 50%"><span></span></span>
-    </div>
-</div> -->
-
 
 {% endblock body %}
 {% block script %}
@@ -148,31 +123,8 @@
                 url: '',
                 type: 'get',
                 success: function (response) {
-                    for (var i = 0; i < response.data.arm_a[0].count_model_in_group; i++) {
-                        if (response.data.arm_a[i].st_actual) {
-                            current_arm_a[i] = response.data.arm_a[i].st_actual;
-                        }
-                    }
-                    
-                    if (JSON.stringify(current_arm_a) == JSON.stringify(pre_arm_a)) {
-                        console.log('Nothing change');
-                    }
-                    else {
-                        for (var i = 0; i < response.data.arm_a[0].count_model_in_group; i++) {
-                            if (response.data.arm_a[i].st_actual) {
-                                pre_arm_a[i] = response.data.arm_a[i].st_actual;
-                            }
-                        }
-
-                        localStorage.setItem('pre_arm_a', JSON.stringify(pre_arm_a));
-                        pre_arm_a = JSON.parse(localStorage.getItem('pre_arm_a'));
-
-                        $('.canvas-arm-a').empty();
-                        $('.canvas-arm-a').append(response.data.canvas_arm_a);
-                        console.log(pre_arm_a);
-                        console.log(current_arm_a);
-                    }
-
+                    $('.canvas-arm-a').empty();
+                    $('.canvas-arm-a').append(response.data.canvas_arm_a);
                     $('.canvas-arm-b').empty();
                     $('.canvas-arm-b').append(response.data.canvas_arm_b);
                     $('.canvas-arm-c').empty();
@@ -201,58 +153,49 @@
                     $('.canvas-ass-j').empty();
                     $('.canvas-ass-j').append(response.data.canvas_ass_j);
 
-                    // Red alarm
-                    if ($('.stt-True-False')[0]) {
-                        setInterval(function () {
-                            $('.stt-True-False').fadeOut(100);
-                            $('.stt-True-False').fadeIn(100);
-                        }, 100);
-                        var alertAudio = new Audio('{% static "sound/Bleep-Sound.mp3" %}');
-                        alertAudio.play();
-                    };
-                    //console.log(response.data.canvas_arm_c);
 
-                    if (response.data.canvas_arm_a) {
+                    console.log(response.data.canvas_arm_a);
+                    if ($.trim(response.data.tbl_arm_a)) {
                         $('.arm-a button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_arm_b) {
+                    if ($.trim(response.data.tbl_arm_b)) {
                         $('.arm-b button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_arm_c) {
+                    if ($.trim(response.data.tbl_arm_c)) {
                         $('.arm-c button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_arm_d) {
+                    if ($.trim(response.data.tbl_arm_d)) {
                         $('.arm-d button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_arm_e) {
+                    if ($.trim(response.data.tbl_arm_e)) {
                         $('.arm-e button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_arm_f) {
+                    if ($.trim(response.data.tbl_arm_f)) {
                         $('.arm-f button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_arm_j) {
+                    if ($.trim(response.data.tbl_arm_j)) {
                         $('.arm-j button').removeAttr('disabled').addClass('enabled');
                     }
 
-                    if (response.data.canvas_ass_a) {
+                    if ($.trim(response.data.tbl_ass_a)) {
                         $('.ass-a button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_ass_b) {
+                    if ($.trim(response.data.tbl_ass_b)) {
                         $('.ass-b button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_ass_c) {
+                    if ($.trim(response.data.tbl_ass_c)) {
                         $('.ass-c button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_ass_d) {
+                    if ($.trim(response.data.tbl_ass_d)) {
                         $('.ass-d button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_ass_e) {
+                    if ($.trim(response.data.tbl_ass_e)) {
                         $('.ass-e button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_ass_f) {
+                    if ($.trim(response.data.tbl_ass_f)) {
                         $('.ass-f button').removeAttr('disabled').addClass('enabled');
                     }
-                    if (response.data.canvas_ass_j) {
+                    if ($.trim(response.data.tbl_ass_j)) {
                         $('.ass-j button').removeAttr('disabled').addClass('enabled');
                     }
                 },
@@ -264,61 +207,61 @@
         // arm
         $('.arm-a button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-arm-a row"></div>');
+            $('.output-data').append('<div class="canvas-arm-a row"></div>');
         });
         $('.arm-b button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-arm-b row"></div>');
+            $('.output-data').append('<div class="canvas-arm-b row"></div>');
         });
         $('.arm-c button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-arm-c row"></div>');
+            $('.output-data').append('<div class="canvas-arm-c row"></div>');
         });
         $('.arm-d button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-arm-d row"></div>');
+            $('.output-data').append('<div class="canvas-arm-d row"></div>');
         });
         $('.arm-e button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-arm-e row"></div>');
+            $('.output-data').append('<div class="canvas-arm-e row"></div>');
         });
         $('.arm-f button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-arm-f row"></div>');
+            $('.output-data').append('<div class="canvas-arm-f row"></div>');
         });
         $('.arm-j button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-arm-j row"></div>');
+            $('.output-data').append('<div class="canvas-arm-j row"></div>');
         });
 
         // ass
         $('.ass-a button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-ass-a row"></div>');
+            $('.output-data').append('<div class="canvas-ass-a row"></div>');
         });
         $('.ass-b button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-ass-b row"></div>');
+            $('.output-data').append('<div class="canvas-ass-b row"></div>');
         });
         $('.ass-c button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-ass-c row"></div>');
+            $('.output-data').append('<div class="canvas-ass-c row"></div>');
         });
         $('.ass-d button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-ass-d row"></div>');
+            $('.output-data').append('<div class="canvas-ass-d row"></div>');
         });
         $('.ass-e button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-ass-e row"></div>');
+            $('.output-data').append('<div class="canvas-ass-e row"></div>');
         });
         $('.ass-f button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-ass-f row"></div>');
+            $('.output-data').append('<div class="canvas-ass-f row"></div>');
         });
         $('.ass-j button').click(function () {
             $('.output-data').empty();
-            $('.output-data').append('<div class="tbl-ass-j row"></div>');
+            $('.output-data').append('<div class="canvas-ass-j row"></div>');
         });
     });
 </script>
