@@ -103,8 +103,8 @@ def get_arr_group_model(today_plan):
                                                                   department__name=last_line.department, line__name=last_line.line,
                                                                   model__name=last_line.model.name, version=last_line.version,
                                                                   qty_plan=last_line.qty_plan)).first()
-                        if before_actual:
-                            end_time = datetime.fromtimestamp(before_actual.timestamps).strftime('%H:%M:%S')
+                        end_time = datetime.fromtimestamp(
+                            before_actual.timestamps).strftime('%H:%M:%S')
 
                     per_finish = last_line.qty_actual / last_line.qty_plan * 100
 
@@ -113,7 +113,6 @@ def get_arr_group_model(today_plan):
                     delta_second = calc_delta(delta_second, last_line.shift_work,
                                               first_line.timestamps, last_line.timestamps)
 
-                    st_actual = 0
                     st_actual = (delta_second + model.st) / \
                         last_line.qty_actual
                     data = {
@@ -307,49 +306,34 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                                                  qty_plan=plan.qty_plan, version=plan.version)
             if write_obj:
                 last_line = write_obj.last()
-                latest_obj = LatestData.objects.filter(date=last_line.date, department=last_line.department,
-                                                       line=last_line.line, model=last_line.model,
-                                                       qty_plan=last_line.qty_plan, version=last_line.version).last()
-                if latest_obj:
-                    print(latest_obj)
-                    # Check database if exists data => not save / if new data => save
-                    if latest_obj.qty_actual != last_line.qty_actual or latest_obj.start != last_line.start \
-                            or latest_obj.machine != last_line.machine or latest_obj.material != last_line.material \
-                            or latest_obj.quality != last_line.quality or latest_obj.other != last_line.other:
-
-                        new_data = LatestData(start=last_line.start, qty_actual=last_line.qty_actual, timestamps=last_line.timestamps,
-                                              machine=last_line.machine, material=last_line.material, quality=last_line.quality,
-                                              other=last_line.other, date=last_line.date, version=last_line.version,
-                                              shift_work=last_line.shift_work, qty_plan=last_line.qty_plan, department=last_line.department,
-                                              line=last_line.line, model=last_line.model)
-                        new_data.save()
-                else:
-                    new_data = LatestData(start=last_line.start, qty_actual=last_line.qty_actual, timestamps=last_line.timestamps,
-                                          machine=last_line.machine, material=last_line.material, quality=last_line.quality,
-                                          other=last_line.other, date=last_line.date, version=last_line.version,
-                                          shift_work=last_line.shift_work, qty_plan=last_line.qty_plan, department=last_line.department,
-                                          line=last_line.line, model=last_line.model)
-                    new_data.save()
-
+                previous_line = last_line
                 if len(write_obj) > 1:  # If found > 1 element in write object
                     # Reverse object, get previous line of last line
-                    previous_line = write_obj.order_by('-id')[1]
-                else:
-                    previous_line = last_line
-                # Calculate fields
-                start_time = datetime.fromtimestamp(
-                    previous_line.timestamps).strftime('%H:%M:%S')
-                end_time = datetime.fromtimestamp(
-                    last_line.timestamps).strftime('%H:%M:%S')
-                per_finish = last_line.qty_actual / last_line.qty_plan * 100
+                    last_line = (WriteData.objects.filter(qty_actual=last_line.qty_actual, date=last_line.date,
+                                                          department__name=last_line.department, line__name=last_line.line,
+                                                          model__name=last_line.model.name, version=last_line.version,
+                                                          qty_plan=last_line.qty_plan)).first()
+                    _previous_line = (WriteData.objects.filter(qty_actual=last_line.qty_actual - 1, date=last_line.date,
+                                                              department__name=last_line.department, line__name=last_line.line,
+                                                              model__name=last_line.model.name, version=last_line.version,
+                                                              qty_plan=last_line.qty_plan)).first()
+                    if _previous_line:
+                        previous_line = _previous_line
 
-                delta_second = last_line.timestamps - previous_line.timestamps
-                # Calculate time of shift work
-                delta_second = calc_delta(delta_second, last_line.shift_work,
-                                          previous_line.timestamps, last_line.timestamps)
-
-                st_actual = 0
                 if last_line.qty_actual != 0:
+                    # Calculate fields
+                    start_time = datetime.fromtimestamp(
+                        previous_line.timestamps).strftime('%H:%M:%S')
+                    end_time = datetime.fromtimestamp(
+                        last_line.timestamps).strftime('%H:%M:%S')
+
+                    per_finish = last_line.qty_actual / last_line.qty_plan * 100
+
+                    delta_second = last_line.timestamps - previous_line.timestamps
+                    # Calculate time of shift work
+                    delta_second = calc_delta(delta_second, last_line.shift_work,
+                                              previous_line.timestamps, last_line.timestamps)
+
                     st_actual = delta_second
                     data = {
                         'start': last_line.start,
@@ -906,7 +890,6 @@ def animation(request):
     dict_ass_f = dict(zip([z for z in range(0, len(arr_ass_f))], arr_ass_f))
     dict_ass_j = dict(zip([z for z in range(0, len(arr_ass_j))], arr_ass_j))
 
-    print(dict_arm_a)
     context = {
         'brand': brand,
         'title': title,

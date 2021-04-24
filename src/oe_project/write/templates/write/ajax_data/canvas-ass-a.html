@@ -1,74 +1,64 @@
-{% for idx, val in dict_ass_a.items %}
-<div class="col-md-12">
-    <canvas id="myCanvas-{{val.department}}-{{val.line}}-{{idx}}" class="canvas-{{ val.department }} canvas-{{ val.department }}-{{ val.line }}" style="border: 1px solid #d3d3d3;">
-        Your browser does not support the HTML canvas tag.
-    </canvas>
-</div>
-<script>
-    function fillColorRect(ctx, startX, startY, width, height, hex_color) {
-        ctx.fillStyle = hex_color;
-        ctx.fillRect(startX, startY, width, height);
-    }
+{% if dict_ass_a %}
+<div class="col-md-2">
+    <div class="model-column-name">
+        <b>ASS - A</b>
+    </div>
+    {% for idx, val in dict_ass_a.items %}
+    <div class="model-box">
+        <div class="model-tag-name" id="model-{{val.department}}-{{val.line}}-{{idx}}">
+            <b>{{ val.model_name }}</b>
+            <div>{{val.st_actual}}</div>
+        </div>
+        <div class="arrow-line" id="arrow-line-{{val.department}}-{{val.line}}-{{idx}}">
+            <div class="st-pointer" id="p-{{val.department}}-{{val.line}}-{{idx}}"></div>
+        </div>
+        <div class="arrow-wrapper">
+            <i class="arrow down"></i>
+        </div>
+    </div>
+    {% if val.st_actual != '0.00' %}
+    <script>
+        var model_box = document.getElementById('model-{{val.department}}-{{val.line}}-{{idx}}');
+        model_box.style.backgroundColor = '#84a8e9';
+        model_box.style.color = '#fff';
+    </script>
+    {% endif %}
+    <script>
+        var st_actual = parseFloat('{{ val.st_actual }}');
+        if (st_actual != 0) {
+            var point_size = st_actual;
+            if (st_actual < 10) {
+                point_size = 10;
+            }
+            if (st_actual > 30) {
+                point_size = 30;
+            }
 
-    function drawTextBox(ctx, startX, startY, box_width, box_height, box_color, text_content, text_color) {
-        fillColorRect(ctx, startX, startY, box_width, box_height, box_color);
-        ctx.strokeRect(startX, startY, box_width, box_height); // Create box contain text
+            var pointer = document.getElementById('p-{{val.department}}-{{val.line}}-{{idx}}');
+            var arrow_height = document.getElementById('arrow-line-{{val.department}}-{{val.line}}-{{idx}}').offsetHeight;
 
-        // Style of text
-        ctx.font = "15px TimesNewRoman";
-        ctx.fillStyle = text_color;
+            pointer.style.height = point_size + 'px';
+            pointer.style.width = point_size + 'px';
+            pointer.style.marginLeft = -point_size / 2 - 1 + 'px';
 
-        // Align center for text content
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(text_content, startX + box_width - box_width / 2, startY + box_height - box_height / 2);
-    }
+            var delay_time = point_size / 6 * 1000;
+            var animation = anime({
+                targets: pointer,
+                translateY: arrow_height - point_size,
+                easing: 'easeInSine',
+                duration: delay_time,
 
-    var count_model = parseInt('{{ val.count_model_in_group }}'); // Number of model in group model
-    var line_canvas = document.getElementById("myCanvas-{{val.department}}-{{val.line}}-{{idx}}");
-    line_canvas.width = window.innerWidth / count_model;
-    line_canvas.height = window.innerHeight;
-    var ctx = line_canvas.getContext("2d");
-
-    var column_width = 8;
-    var column_height = window.innerHeight / 8;
-    var x_start = line_canvas.width / 2 - column_width / 2;
-    var y_start = (line_canvas.height - column_height * count_model) / 2;
-    var list_color = ['#1877f2', '#ffffa3', '#4FC08D', '#d3d3d3', '#66C1FF', '#fcf1b1', '#A7EEC9'];
-
-    var x_center = line_canvas.width / 2;
-    var y_center = line_canvas.height / 2;
-    var box_width = 70;
-    var box_height = 30;
-    var text_content_left = 'ts actual';
-    var text_content_right = '{{ val.st_actual }}';
-    var box_color_left = '#84A8E9';
-    var text_color_left = '#000';
-    var box_color_right = '#fcf1b1';
-    var text_color_right = '#000';
-
-    var model_order = parseInt('{{ val.model_order }}'); // Get current model running
-    var per_finish = parseFloat('{{ val.per_finish }}'); // Get per_finish of plan
-    if (per_finish > 100) per_finish = 100;
-    var value = column_height * per_finish / 100 + column_height * (model_order - 1); // column_height * count_model;
-    var y_value = y_start + value; // Dynamic variable % finish plan
-
-    for (var i = 0; i < count_model; i++) { // Draw line depend on number of model
-        ctx.strokeRect(x_start, y_start + column_height * i, column_width, column_height);
-        if (value > column_height * i) { // Check y coordinate of value
-            fillColorRect(ctx, x_start, y_start + column_height * i, column_width, value - column_height * i, list_color[i]);
+                complete: function (anim) {
+                    animation.remove();
+                }
+            });
         }
-    }
-
-    var space_left_right = 20; // Space between left/right box with center
-    var left = x_start + column_width / 2 - box_width - space_left_right;
-    var right = x_start + column_width / 2 + space_left_right;
-    drawTextBox(ctx, left, y_value - box_height / 2, box_width, box_height, box_color_left, text_content_left, text_color_left); // Left box
-    drawTextBox(ctx, right, y_value - box_height / 2, box_width, box_height, box_color_right, text_content_right, text_color_right); // Right box
-    // Draw line % finish
-    ctx.beginPath();
-    ctx.moveTo(left + box_width, y_value);
-    ctx.lineTo(right, y_value);
-    ctx.stroke();
-</script>
-{% endfor %}
+    </script>
+    {% endfor %}
+    <div class="model-box">
+        <div class="model-tag-name">
+            <b>Finish</b>
+        </div>
+    </div>
+</div>
+{% endif %}
