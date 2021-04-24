@@ -820,7 +820,7 @@ def history(request):
     return render(request, 'write/history.html', context=context)
 
 
-def animation(request):
+def chart(request):
     title = 'Animation'
     my_date = datetime.fromtimestamp(
         datetime.timestamp(timezone.now())).strftime('%Y-%m-%d')
@@ -966,7 +966,7 @@ def animation(request):
             }
             return JsonResponse({'data': data}, status=200)
 
-    return render(request, 'write/animation.html', context=context)
+    return render(request, 'write/chart.html', context=context)
 
 
 def check_plan(request):
