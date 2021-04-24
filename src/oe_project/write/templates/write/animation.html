@@ -152,7 +152,7 @@
                     $('.canvas-ass-f').append(response.data.canvas_ass_f);
                     $('.canvas-ass-j').empty();
                     $('.canvas-ass-j').append(response.data.canvas_ass_j);
-                    console.log('canvas', response.data.canvas_arm_a);
+                    
                     if ($.trim(response.data.canvas_arm_a)) {
                         $('.arm-a button').removeAttr('disabled').addClass('enabled');
                     }
