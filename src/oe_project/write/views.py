@@ -85,21 +85,35 @@ def get_arr_group_model(today_plan):
                 last_line = write_obj.last()
                 first_line = (WriteData.objects.filter(date=last_line.date, department__name=last_line.department,
                                                        line__name=last_line.line, model__name=last_line.model.name,
-                                                       version=last_line.version, qty_plan=last_line.qty_plan))[0]
-                # Calculator fields
-                start_time = datetime.fromtimestamp(
-                    first_line.timestamps).strftime('%H:%M:%S')
-                end_time = datetime.fromtimestamp(
-                    last_line.timestamps).strftime('%H:%M:%S')
-                per_finish = last_line.qty_actual / last_line.qty_plan * 100
+                                                       version=last_line.version, qty_plan=last_line.qty_plan)).first()
+                previous_line = last_line
+                if len(write_obj) > 1:  # If found > 1 element in write object
+                    # Reverse object, get previous line of last line
+                    previous_line = write_obj.order_by('-id')[1]
 
-                delta_second = last_line.timestamps - first_line.timestamps
-                # Calculate time of shift work
-                delta_second = calc_delta(delta_second, last_line.shift_work,
-                                          first_line.timestamps, last_line.timestamps)
-
-                st_actual = 0
                 if last_line.qty_actual != 0:
+                    # Calculator fields
+                    start_time = datetime.fromtimestamp(
+                        first_line.timestamps).strftime('%H:%M:%S')
+                    end_time = datetime.fromtimestamp(
+                        last_line.timestamps).strftime('%H:%M:%S')
+
+                    if last_line.qty_actual == previous_line.qty_actual:  # If qty_actual not change
+                        before_actual = (WriteData.objects.filter(qty_actual=last_line.qty_actual, date=last_line.date,
+                                                                  department__name=last_line.department, line__name=last_line.line,
+                                                                  model__name=last_line.model.name, version=last_line.version,
+                                                                  qty_plan=last_line.qty_plan)).first()
+                        if before_actual:
+                            end_time = datetime.fromtimestamp(before_actual.timestamps).strftime('%H:%M:%S')
+
+                    per_finish = last_line.qty_actual / last_line.qty_plan * 100
+
+                    delta_second = last_line.timestamps - first_line.timestamps
+                    # Calculate time of shift work
+                    delta_second = calc_delta(delta_second, last_line.shift_work,
+                                              first_line.timestamps, last_line.timestamps)
+
+                    st_actual = 0
                     st_actual = (delta_second + model.st) / \
                         last_line.qty_actual
                     data = {
@@ -298,21 +312,24 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                                                        qty_plan=last_line.qty_plan, version=last_line.version).last()
                 if latest_obj:
                     print(latest_obj)
-                    if latest_obj.qty_actual != last_line.qty_actual \
-                            or latest_obj.start != last_line.start \
-                            or latest_obj.machine != last_line.machine \
-                            or latest_obj.material != last_line.material \
-                            or latest_obj.quality != last_line.quality \
-                            or latest_obj.other != last_line.other:
-                        print(last_line)
-                        print(latest_obj)
-                        print('Save')
-                    else:
-                        print('Duplicate')
+                    # Check database if exists data => not save / if new data => save
+                    if latest_obj.qty_actual != last_line.qty_actual or latest_obj.start != last_line.start \
+                            or latest_obj.machine != last_line.machine or latest_obj.material != last_line.material \
+                            or latest_obj.quality != last_line.quality or latest_obj.other != last_line.other:
+
+                        new_data = LatestData(start=last_line.start, qty_actual=last_line.qty_actual, timestamps=last_line.timestamps,
+                                              machine=last_line.machine, material=last_line.material, quality=last_line.quality,
+                                              other=last_line.other, date=last_line.date, version=last_line.version,
+                                              shift_work=last_line.shift_work, qty_plan=last_line.qty_plan, department=last_line.department,
+                                              line=last_line.line, model=last_line.model)
+                        new_data.save()
                 else:
-                    latest_obj = last_line
-                    latest_obj.pk = None
-                    latest_obj.save()
+                    new_data = LatestData(start=last_line.start, qty_actual=last_line.qty_actual, timestamps=last_line.timestamps,
+                                          machine=last_line.machine, material=last_line.material, quality=last_line.quality,
+                                          other=last_line.other, date=last_line.date, version=last_line.version,
+                                          shift_work=last_line.shift_work, qty_plan=last_line.qty_plan, department=last_line.department,
+                                          line=last_line.line, model=last_line.model)
+                    new_data.save()
 
                 if len(write_obj) > 1:  # If found > 1 element in write object
                     # Reverse object, get previous line of last line

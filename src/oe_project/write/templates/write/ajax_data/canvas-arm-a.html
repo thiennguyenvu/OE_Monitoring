@@ -1,11 +1,13 @@
-{% load static %}
-{% for idx, val in dict_arm_a.items %}
 <div class="col-md-2">
+    {% for idx, val in dict_arm_a.items %}
     <div class="model-box">
-        <div class="model-tag-name"><b>{{ val.model_name }}</b></div>
+        <div class="model-tag-name">
+            <b>{{ val.model_name }}</b>
+            <div>{{val.st_actual}}</div>
+        </div>
 
         <div class="arrow-line">
-            <div class="st-pointer"></div>
+            <div class="st-pointer" id="p-{{idx}}"></div>
         </div>
         <div class="arrow-wrapper">
             <i class="arrow down"></i>
@@ -14,14 +16,27 @@
     <script>
         var st_arm_a = 0;
         var st_actual = parseFloat('{{ val.st_actual }}');
+        var point_size = st_actual;
+        if (st_actual < 10){
+            point_size = 10;
+        }
+        if (st_actual > 30){
+            point_size = 30;
+        }
+        console.log(st_actual);
+        
+        var pointer = document.getElementById('p-{{idx}}');
+        console.log(pointer);
+        pointer.style.height = point_size + 'px';
+        pointer.style.width = point_size + 'px';
 
         if (st_arm_a != st_actual) {
             st_arm_a = st_actual;
 
 
-            var delay_time = st_arm_a * 1000;
+            var delay_time = point_size/6 * 1000;
             var animation = anime({
-                targets: '.st-pointer',
+                targets: pointer,
                 translateY: 85,
                 easing: 'easeInSine',
                 duration: delay_time,
@@ -35,5 +50,5 @@
 
         }
     </script>
+    {% endfor %}
 </div>
-{% endfor %}
