@@ -98,17 +98,19 @@ def get_arr_group_model(today_plan):
                     end_time = datetime.fromtimestamp(
                         last_line.timestamps).strftime('%H:%M:%S')
 
+                    per_finish = last_line.qty_actual / last_line.qty_plan * 100
+                    delta_second = last_line.timestamps - first_line.timestamps
+
                     if last_line.qty_actual == previous_line.qty_actual:  # If qty_actual not change
                         before_actual = (WriteData.objects.filter(qty_actual=last_line.qty_actual, date=last_line.date,
                                                                   department__name=last_line.department, line__name=last_line.line,
                                                                   model__name=last_line.model.name, version=last_line.version,
                                                                   qty_plan=last_line.qty_plan)).first()
+                        # End time and delta second just change when qty_actual change
                         end_time = datetime.fromtimestamp(
                             before_actual.timestamps).strftime('%H:%M:%S')
-
-                    per_finish = last_line.qty_actual / last_line.qty_plan * 100
-
-                    delta_second = last_line.timestamps - first_line.timestamps
+                        delta_second = before_actual.timestamps - first_line.timestamps
+                    
                     # Calculate time of shift work
                     delta_second = calc_delta(delta_second, last_line.shift_work,
                                               first_line.timestamps, last_line.timestamps)
@@ -889,6 +891,12 @@ def chart(request):
     dict_ass_e = dict(zip([z for z in range(0, len(arr_ass_e))], arr_ass_e))
     dict_ass_f = dict(zip([z for z in range(0, len(arr_ass_f))], arr_ass_f))
     dict_ass_j = dict(zip([z for z in range(0, len(arr_ass_j))], arr_ass_j))
+
+    from django.db.models import Count
+    res = WriteData.objects.values('model_id', 'model__group__name').annotate(Count('model_id'))
+    print(res)
+    for i in res:
+        print(i['model__group__name'])
 
     context = {
         'brand': brand,
