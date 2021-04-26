@@ -110,7 +110,7 @@ def get_arr_group_model(today_plan):
                         end_time = datetime.fromtimestamp(
                             before_actual.timestamps).strftime('%H:%M:%S')
                         delta_second = before_actual.timestamps - first_line.timestamps
-                    
+
                     # Calculate time of shift work
                     delta_second = calc_delta(delta_second, last_line.shift_work,
                                               first_line.timestamps, last_line.timestamps)
@@ -308,86 +308,124 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                                                  qty_plan=plan.qty_plan, version=plan.version)
             if write_obj:
                 last_line = write_obj.last()
-                previous_line = last_line
-                if len(write_obj) > 1:  # If found > 1 element in write object
-                    # Reverse object, get previous line of last line
-                    last_line = (WriteData.objects.filter(qty_actual=last_line.qty_actual, date=last_line.date,
-                                                          department__name=last_line.department, line__name=last_line.line,
-                                                          model__name=last_line.model.name, version=last_line.version,
-                                                          qty_plan=last_line.qty_plan)).first()
-                    _previous_line = (WriteData.objects.filter(qty_actual=last_line.qty_actual - 1, date=last_line.date,
-                                                              department__name=last_line.department, line__name=last_line.line,
-                                                              model__name=last_line.model.name, version=last_line.version,
-                                                              qty_plan=last_line.qty_plan)).first()
-                    if _previous_line:
-                        previous_line = _previous_line
+                latest_obj = LatestData.objects.filter(date=last_line.date, department=last_line.department,
+                                                       line=last_line.line, model=last_line.model,
+                                                       qty_plan=last_line.qty_plan, version=last_line.version).last()
+                data = []
+                if latest_obj:
+                    st_actual_previous = '0.00'
+                    st_actual = '0.00'
+                    
+                    # Find data
+                    previous_line = last_line
+                    if len(write_obj) > 1:  # If found > 1 element in write object
+                        # Get previous qty_actual
+                        current_line = (WriteData.objects.filter(qty_actual=last_line.qty_actual, date=last_line.date,
+                                                                 department__name=last_line.department, line__name=last_line.line,
+                                                                 model__name=last_line.model.name, version=last_line.version,
+                                                                 qty_plan=last_line.qty_plan)).first()
+                        _previous_line = (WriteData.objects.filter(qty_actual=current_line.qty_actual - 1, date=current_line.date,
+                                                                   department__name=current_line.department, line__name=current_line.line,
+                                                                   model__name=current_line.model.name, version=current_line.version,
+                                                                   qty_plan=current_line.qty_plan)).first()
+                        if _previous_line:
+                            previous_line = _previous_line
 
-                if last_line.qty_actual != 0:
-                    # Calculate fields
-                    start_time = datetime.fromtimestamp(
-                        previous_line.timestamps).strftime('%H:%M:%S')
-                    end_time = datetime.fromtimestamp(
-                        last_line.timestamps).strftime('%H:%M:%S')
+                    if last_line.qty_actual != 0:
+                        # Calculate fields
+                        start_time = datetime.fromtimestamp(
+                            previous_line.timestamps).strftime('%H:%M:%S')
+                        end_time = datetime.fromtimestamp(
+                            current_line.timestamps).strftime('%H:%M:%S')
 
-                    per_finish = last_line.qty_actual / last_line.qty_plan * 100
+                        per_finish = current_line.qty_actual / current_line.qty_plan * 100
 
-                    delta_second = last_line.timestamps - previous_line.timestamps
-                    # Calculate time of shift work
-                    delta_second = calc_delta(delta_second, last_line.shift_work,
-                                              previous_line.timestamps, last_line.timestamps)
+                        delta_second = current_line.timestamps - previous_line.timestamps
+                        # Calculate time of shift work
+                        delta_second = calc_delta(delta_second, current_line.shift_work,
+                                                  previous_line.timestamps, current_line.timestamps)
 
-                    st_actual = delta_second
-                    data = {
-                        'start': last_line.start,
-                        'qty_actual': last_line.qty_actual,
-                        'timestamps': last_line.timestamps,
-                        'machine': last_line.machine,
-                        'material': last_line.material,
-                        'quality': last_line.quality,
-                        'other': last_line.other,
-                        'date': last_line.date,
-                        'version': last_line.version,
-                        'shift_work': last_line.shift_work,
-                        'department': last_line.department.name,
-                        'line': last_line.line.name,
-                        'count_model_in_group': len(selected_group),
-                        'model_group': model.group.description,
-                        'model_name': model.description,
-                        'model_order': model.order,
-                        'st_plan': f"{model.st:.2f}",
-                        'qty_plan': last_line.qty_plan,
+                        # Get previous st
+                        st_actual_previous = f"{delta_second:.2f}"
 
-                        'start_time': start_time,
-                        'end_time': end_time,
-                        'st_actual': f"{st_actual:.2f}",
-                        'per_finish': f"{per_finish:.2f}",
-                    }
+                        # Check database change(if old data => not save / if new data => save)
+                        if latest_obj.qty_actual != last_line.qty_actual or latest_obj.start != last_line.start \
+                                or latest_obj.machine != last_line.machine or latest_obj.material != last_line.material \
+                                or latest_obj.quality != last_line.quality or latest_obj.other != last_line.other:
+
+                            new_data = LatestData(start=last_line.start, qty_actual=last_line.qty_actual, timestamps=last_line.timestamps,
+                                                machine=last_line.machine, material=last_line.material, quality=last_line.quality,
+                                                other=last_line.other, date=last_line.date, version=last_line.version,
+                                                shift_work=last_line.shift_work, qty_plan=last_line.qty_plan, department=last_line.department,
+                                                line=last_line.line, model=last_line.model)
+                            new_data.save()
+
+                            # If data change => update st_actual
+                            if latest_obj.qty_actual != last_line.qty_actual:
+                                st_actual = f"{delta_second:.2f}"
+
+                        data = {
+                            'start': last_line.start,
+                            'qty_actual': last_line.qty_actual,
+                            'timestamps': last_line.timestamps,
+                            'machine': last_line.machine,
+                            'material': last_line.material,
+                            'quality': last_line.quality,
+                            'other': last_line.other,
+                            'date': last_line.date,
+                            'version': last_line.version,
+                            'shift_work': last_line.shift_work,
+                            'department': last_line.department.name,
+                            'line': last_line.line.name,
+                            'count_model_in_group': len(selected_group),
+                            'model_group': model.group.description,
+                            'model_name': model.description,
+                            'model_order': model.order,
+                            'st_plan': f"{model.st:.2f}",
+                            'qty_plan': last_line.qty_plan,
+
+                            'start_time': start_time,
+                            'end_time': end_time,
+                            'st_actual': st_actual,
+                            'st_actual_previous': st_actual_previous,
+                            'per_finish': f"{per_finish:.2f}",
+                        }
+                    else:
+                        data = {
+                            'start': False,
+                            'qty_actual': 0,
+                            'timestamps': last_line.timestamps,
+                            'machine': True,
+                            'material': True,
+                            'quality': True,
+                            'other': True,
+                            'date': last_line.date,
+                            'version': last_line.version,
+                            'shift_work': last_line.shift_work,
+                            'department': last_line.department.name,
+                            'line': last_line.line.name,
+                            'count_model_in_group': len(selected_group),
+                            'model_group': model.group.description,
+                            'model_name': model.description,
+                            'model_order': model.order,
+                            'st_plan': '0.00',
+                            'qty_plan': 0,
+
+                            'start_time': '00:00:00',
+                            'end_time': '00:00:00',
+                            'st_actual': '0.00',
+                            'st_actual_previous': st_actual_previous,
+                            'per_finish': '0.00',
+                        }
+
                 else:
-                    data = {
-                        'start': False,
-                        'qty_actual': 0,
-                        'timestamps': last_line.timestamps,
-                        'machine': True,
-                        'material': True,
-                        'quality': True,
-                        'other': True,
-                        'date': last_line.date,
-                        'version': last_line.version,
-                        'shift_work': last_line.shift_work,
-                        'department': last_line.department.name,
-                        'line': last_line.line.name,
-                        'count_model_in_group': len(selected_group),
-                        'model_group': model.group.description,
-                        'model_name': model.description,
-                        'model_order': model.order,
-                        'st_plan': '0.00',
-                        'qty_plan': 0,
+                    new_data = LatestData(start=last_line.start, qty_actual=last_line.qty_actual, timestamps=last_line.timestamps,
+                                          machine=last_line.machine, material=last_line.material, quality=last_line.quality,
+                                          other=last_line.other, date=last_line.date, version=last_line.version,
+                                          shift_work=last_line.shift_work, qty_plan=last_line.qty_plan, department=last_line.department,
+                                          line=last_line.line, model=last_line.model)
+                    new_data.save()
 
-                        'start_time': '00:00:00',
-                        'end_time': '00:00:00',
-                        'st_actual': '0.00',
-                        'per_finish': '0.00',
-                    }
                 arr.append(data)
     return arr
 
@@ -891,12 +929,6 @@ def chart(request):
     dict_ass_e = dict(zip([z for z in range(0, len(arr_ass_e))], arr_ass_e))
     dict_ass_f = dict(zip([z for z in range(0, len(arr_ass_f))], arr_ass_f))
     dict_ass_j = dict(zip([z for z in range(0, len(arr_ass_j))], arr_ass_j))
-
-    from django.db.models import Count
-    res = WriteData.objects.values('model_id', 'model__group__name').annotate(Count('model_id'))
-    print(res)
-    for i in res:
-        print(i['model__group__name'])
 
     context = {
         'brand': brand,
