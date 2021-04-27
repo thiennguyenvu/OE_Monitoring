@@ -861,7 +861,7 @@ def history(request):
 
 
 def chart(request):
-    title = 'Animation'
+    title = 'Chart'
     my_date = datetime.fromtimestamp(
         datetime.timestamp(timezone.now())).strftime('%Y-%m-%d')
 
