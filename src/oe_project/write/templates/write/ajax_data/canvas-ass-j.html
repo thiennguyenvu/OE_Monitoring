@@ -24,8 +24,7 @@
         <div class="arrow-wrapper">
             <i class="arrow down"></i>
         </div>
-        {% if val.machine == False or val.material == False or val.quality == False or val.other == False %} {# Change
-        color when error #}
+        {% if val.machine == False or val.material == False or val.quality == False or val.other == False %}
         <script>
             var model_box = document.getElementById('model-{{val.department}}-{{val.line}}-{{idx}}');
             model_box.style.backgroundColor = '#FF4F4F';
