@@ -4,7 +4,9 @@
 {% endblock head %}
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <!-- .fixed-top -->
-    <img src="{% static 'images/logo.png' %}" id="dj-logo" alt="dj-logo">
+    <a class="logo-container" href="{% url 'home' %}">
+        <img src="{% static 'images/logo.png' %}" id="dj-logo" alt="dj-logo">
+    </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
         aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
