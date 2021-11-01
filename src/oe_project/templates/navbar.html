@@ -1,0 +1,78 @@
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+{% endblock head %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <!-- .fixed-top -->
+    <img src="{% static 'images/logo.png' %}" id="dj-logo" alt="dj-logo">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+        aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+        <ul class="navbar-nav w-100">
+
+            {% if title == 'View' %}
+            <li class="nav-item active">
+                {% else %}
+            <li class="nav-item">
+                {% endif %}
+                <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-tachometer-alt"></i><span
+                        class="label">Dashboard</span></a>
+            </li>
+
+            {% if title == 'Planning' %}
+            <li class="nav-item active">
+                {% else %}
+            <li class="nav-item">
+                {% endif %}
+                <a class="nav-link" href="{% url 'planning' %}"><i class="fas fa-clipboard-list"></i><span
+                        class="label">Planning</span></a>
+            </li>
+
+            {% if title == 'History' %}
+            <li class="nav-item active">
+                {% else %}
+            <li class="nav-item">
+                {% endif %}
+                <a class="nav-link" href="{% url 'history' %}"><i class="fas fa-history"></i><span
+                        class="label">History</span></a>
+            </li>
+
+            {% if title == 'Chart' %}
+            <li class="nav-item active">
+                {% else %}
+            <li class="nav-item">
+                {% endif %}
+                <a class="nav-link" href="{% url 'chart' %}"><i class="far fa-chart-bar"></i><span
+                        class="label">Chart</span></a>
+            </li>
+            
+            {% if title == 'Check Plan' %}
+            <li class="nav-item active">
+                {% else %}
+            <li class="nav-item">
+                {% endif %}
+                <a class="nav-link" href="{% url 'check_plan' %}"><i class="fas fa-tasks"></i><span
+                        class="label">Check Plan</span></a>
+            </li>
+        </ul>
+        <ul class="navbar-nav w-50">
+            <li class="nav-item dropdown ml-auto">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false" aria-label="settings"><i
+                        class="fas fa-sliders-h"></i></a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{% url 'admin:index' %}"><i
+                            class="fas fa-cogs"></i><span class="label">Admin & Settings</span></a>
+                    <a class="dropdown-item" href="{% url 'check_plan' %}"><i class="fas fa-tasks"></i><span class="label">Check Plan</span></a>
+                    <a class="dropdown-item" href="mailto:it@dongjinvietnam.com"><i class="fas fa-comment-dots"></i><span class="label">Give
+                            Feedback/Report a bug</span></a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item"><span
+                            class="label">©Copyright 2021 DONGJIN VIETNAM JSC.</span></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
