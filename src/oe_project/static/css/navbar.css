@@ -1,14 +1,45 @@
-.dropdown-item span.label, .nav-item span.label{
-    margin: 0px 10px;
+.dropdown-item span.label,
+.nav-item span.label {
+  margin: 0px 10px;
 }
 @media only screen and (max-width: 992px) {
+  /* Navbar mobile settings */
   .nav-item.dropdown.ml-auto {
     margin-left: unset !important;
+  }
+  .nav-item.dropdown.ml-auto.show {
+    margin-left: auto !important;
+  }
+  #navbarNavDropdown .nav-link {
+    padding-left: 15px;
   }
 }
 
 .navbar-profile-img {
   width: 32px;
   height: 32px;
-  border-radius: 50px; 
+  border-radius: 50px;
+}
+
+/* Highlight selected tab of navbar */
+.nav-item.active,
+.dropdown-item:hover {
+  background-color: rgba(41, 138, 212);
+}
+
+.nav-item.active .label,
+.nav-item.active svg {
+  color: #ffffff;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  font-weight: bold;
+}
+
+.navbar-light .navbar-nav .nav-link:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dropdown-item:hover {
+  color: #ffffff;
 }

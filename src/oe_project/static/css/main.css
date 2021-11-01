@@ -75,3 +75,7 @@ svg.user-avatar {
 .profile-bio #id_bio {
   height: 100px;
 }
+
+.bg-light{
+  background-color: #FCF6D0 !important;
+}
