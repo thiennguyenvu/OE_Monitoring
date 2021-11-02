@@ -247,10 +247,58 @@ table.table-history {
   font-size: 40px;
 }
 
+.ng-label{
+  font-size: 18px;
+}
+
 /* Hide create plan on mobile */
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 767px){
   .hide-on-mobile {
     display: none;
+  }
+}
+
+@media only screen and (max-width: 1464px) {
+  .fa-signal{
+    font-size: 20px;
+  }
+
+  .output-data .data-line{
+    font-size: 20px;
+    padding-left: 0px;
+  }
+
+  .output-data .data-date{
+    font-size: 8px;
+    padding-right: 5px;
+  }
+
+  .output-data .data-time{
+    font-size: 10px;
+  }
+
+  .output-data .data-label{
+    padding: 5px;
+    font-size: 10px;
+    width: 35px;
+  }
+
+  .output-data .data-value{
+    font-size: 20px;
+    min-width: 90px;
+  }
+
+  .output-data .data-model{
+    font-size: 12px;
+    min-width: 50px;
+  }
+
+  .fa-circle{
+    font-size: 16px;
+  }
+
+  .ng-label{
+    font-size: 8px;
   }
 }
 
