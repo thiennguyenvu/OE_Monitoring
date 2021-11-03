@@ -10,6 +10,15 @@ form {
 }
 
 /* Label, input settings */
+@media only screen and (max-width: 768px){
+  #form-history .table-history{
+    width: 60%;
+  }
+  #form-history .col-md-8{
+    width: 40%;
+  }
+}
+
 #form-plan label,
 #form-history label,
 .table-history label {
@@ -108,7 +117,7 @@ table.table-history {
 .table-history tr,
 .table-history td {
   text-align: center;
-  /* border: 1px groove #ddd; */
+  border: 1px groove #ddd;
 }
 
 .table-history > tbody > tr > td,
