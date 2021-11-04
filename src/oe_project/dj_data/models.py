@@ -37,7 +37,7 @@ class DJProcess(models.Model):
     name = models.CharField(max_length=100)
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=True)
-    group = models.ForeignKey(DJModel, on_delete=models.CASCADE, null=True)
+    model = models.ForeignKey(DJModel, on_delete=models.CASCADE, null=True)
     st = models.FloatField(default=22)
     description = models.CharField(max_length=100, null=True, blank=True)
     order = models.PositiveIntegerField(default=0)

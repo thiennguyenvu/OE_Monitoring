@@ -16,7 +16,7 @@ class WriteData(models.Model):
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=True)
     line = models.ForeignKey(Line, on_delete=models.CASCADE, null=True)
-    model = models.ForeignKey(DJProcess, on_delete=models.CASCADE, null=True)
+    process = models.ForeignKey(DJProcess, on_delete=models.CASCADE, null=True)
     version = models.PositiveIntegerField()
     shift_work = models.BooleanField(default=False)
     qty_plan = models.PositiveIntegerField()
@@ -28,7 +28,7 @@ class Planning(models.Model):
     time = models.CharField(max_length=10)
     department = models.CharField(max_length=3)
     line = models.CharField(max_length=1)
-    group_model = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
     version = models.PositiveIntegerField()
     shift_work = models.BooleanField()
     qty_plan = models.PositiveIntegerField()
@@ -46,7 +46,7 @@ class LatestData(models.Model):
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, null=True)
     line = models.ForeignKey(Line, on_delete=models.CASCADE, null=True)
-    model = models.ForeignKey(DJProcess, on_delete=models.CASCADE, null=True)
+    process = models.ForeignKey(DJProcess, on_delete=models.CASCADE, null=True)
     version = models.PositiveIntegerField()
     shift_work = models.BooleanField(default=False)
     qty_plan = models.PositiveIntegerField()

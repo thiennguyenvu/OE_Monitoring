@@ -22,7 +22,7 @@
             padding-right: 0px;
         }
     </style>
-    {% for model in my_models %}
+    {% for process in my_processes %}
     <div class="col-md-6 table-align">
         <form method='post'>
             {% csrf_token %}
@@ -32,9 +32,9 @@
                         Department - Line: <b>{{ my_plan.department }} - {{ my_plan.line }}</b>
                     </div>
                     <div class="col-md-8">
-                        Model: <b>{{ model.group.description }}-{{ model.description }}</b>
-                        <input id="btn-model-{{ model.id }}" type="hidden" class="btn-model-id" name="btn-model-id"
-                            value="{{ model.id }}">
+                        Model: <b>{{ process.model.description }}-{{ process.description }}</b>
+                        <input id="btn-process-{{ process.id }}" type="hidden" class="btn-process-id" name="btn-process-id"
+                            value="{{ process.id }}">
                     </div>
                 </div>
                 <div class="row">
@@ -42,7 +42,7 @@
                         Qty Plan: <b>{{ my_plan.qty_plan }}</b>
                     </div>
                     <div class="col-md-4">
-                        ST Plan: <b>{{ model.st }}</b>
+                        ST Plan: <b>{{ process.st }}</b>
                     </div>
                     <div class="col-md-4">
                         Version: <b>{{ my_plan.version }}</b>

@@ -73,18 +73,18 @@ def calc_delta(delta_second, shift_3rd, begin_time, end_time):
 def get_arr_group_model(today_plan):
     arr = []
     if today_plan:
-        # Get today group model
-        selected_group = DJProcess.objects.filter(group__description=today_plan.group_model,
+        # Get today processes in model
+        selected_group = DJProcess.objects.filter(model__description=today_plan.model,
                                                 department__name=today_plan.department)
         day = datetime.fromtimestamp(today_plan.timestamp).strftime(
             '%Y-%m-%d')
-        for model in selected_group:  # Loop through all models in group
+        for process in selected_group:  # Loop through all models in group
             write_obj = WriteData.objects.filter(date=day, department__name=today_plan.department,
-                                                 line__name=today_plan.line, model=model)
+                                                 line__name=today_plan.line, process=process)
             if write_obj:
                 last_line = write_obj.last()
                 first_line = (WriteData.objects.filter(date=last_line.date, department__name=last_line.department,
-                                                       line__name=last_line.line, model__name=last_line.model.name,
+                                                       line__name=last_line.line, process__name=last_line.process.name,
                                                        version=last_line.version, qty_plan=last_line.qty_plan)).first()
                 previous_line = last_line
                 if len(write_obj) > 1:  # If found > 1 element in write object
@@ -104,7 +104,7 @@ def get_arr_group_model(today_plan):
                     if last_line.qty_actual == previous_line.qty_actual:  # If qty_actual not change
                         before_actual = (WriteData.objects.filter(qty_actual=last_line.qty_actual, date=last_line.date,
                                                                   department__name=last_line.department, line__name=last_line.line,
-                                                                  model__name=last_line.model.name, version=last_line.version,
+                                                                  process__name=last_line.process.name, version=last_line.version,
                                                                   qty_plan=last_line.qty_plan)).first()
                         # End time and delta second just change when qty_actual change
                         end_time = datetime.fromtimestamp(
@@ -115,7 +115,7 @@ def get_arr_group_model(today_plan):
                     delta_second = calc_delta(delta_second, last_line.shift_work,
                                               first_line.timestamps, last_line.timestamps)
 
-                    st_actual = (delta_second + model.st) / \
+                    st_actual = (delta_second + process.st) / \
                         last_line.qty_actual
                     data = {
                         'start': last_line.start,
@@ -130,9 +130,9 @@ def get_arr_group_model(today_plan):
                         'shift_work': last_line.shift_work,
                         'department': last_line.department.name,
                         'line': last_line.line.name,
-                        'model_group': model.group.description,
-                        'model_name': model.description,
-                        'st_plan': f"{model.st:.2f}",
+                        'model_name': process.model.description,
+                        'process_name': process.description,
+                        'st_plan': f"{process.st:.2f}",
                         'qty_plan': last_line.qty_plan,
 
                         'start_time': start_time,
@@ -154,8 +154,8 @@ def get_arr_group_model(today_plan):
                         'shift_work': last_line.shift_work,
                         'department': last_line.department.name,
                         'line': last_line.line.name,
-                        'model_group': model.group.description,
-                        'model_name': model.description,
+                        'model_name': process.model.description,
+                        'process_name': process.description,
                         'st_plan': '0.00',
                         'qty_plan': 0,
 
@@ -172,8 +172,8 @@ def get_arr_group_model(today_plan):
 def get_arr_plan(today_plan):
     arr = []
     if today_plan:
-        # Get today group model
-        selected_group = DJProcess.objects.filter(group__description=today_plan.group_model,
+        # Get today processes in model
+        selected_group = DJProcess.objects.filter(model__description=today_plan.model,
                                                 department__name=today_plan.department)
 
         for i in range(0, len(selected_group)):
@@ -191,11 +191,11 @@ def get_arr_plan(today_plan):
                 'Department': selected_group[i].department.id,
                 'Line Name': today_plan.line,
                 'Line': Line.objects.get(name=today_plan.line).id,
-                'Model Name': selected_group[i].description,
-                'Model': selected_group[i].id,
+                'Process Name': selected_group[i].description,
+                'Process ID': selected_group[i].id,
                 'Count Model In Group': len(selected_group),
-                'Model Group Name': selected_group[i].group.description,
-                'Model Group': selected_group[i].group.id,
+                'Model Name': selected_group[i].model.description,
+                'Model ID': selected_group[i].model.id,
                 'Version': today_plan.version,
                 'Shift Work': 1 if today_plan.shift_work else 0,
                 'Q\'ty Plan': today_plan.qty_plan,
@@ -213,15 +213,15 @@ def get_arr_history(selected_plan):
         # Get all plan of selected date
         for plan in selected_plan:
             # Get all model in group model of this plan
-            selected_group = DJProcess.objects.filter(group__description=plan.group_model,
+            selected_group = DJProcess.objects.filter(model__description=plan.model,
                                                     department__name=plan.department)
 
             day = datetime.fromtimestamp(plan.timestamp).strftime(
                 '%Y-%m-%d')
             # Calculate for all model in selected group
-            for model in selected_group:
+            for process in selected_group:
                 write_obj = WriteData.objects.filter(date=day, department__name=plan.department,
-                                                     line__name=plan.line, model=model,
+                                                     line__name=plan.line, process=process,
                                                      qty_plan=plan.qty_plan, version=plan.version)
                 if write_obj:
                     last_line = write_obj.last()
@@ -240,7 +240,7 @@ def get_arr_history(selected_plan):
 
                     st_actual = 0
                     if last_line.qty_actual != 0:
-                        st_actual = (delta_second + model.st) / \
+                        st_actual = (delta_second + process.st) / \
                             last_line.qty_actual
                         data = {
                             'start': last_line.start,
@@ -255,9 +255,9 @@ def get_arr_history(selected_plan):
                             'shift_work': last_line.shift_work,
                             'department': last_line.department.name,
                             'line': last_line.line.name,
-                            'model_group': model.group.description,
-                            'model_name': model.description,
-                            'st_plan': f"{model.st:.2f}",
+                            'model_name': process.model.description,
+                            'process_name': process.description,
+                            'st_plan': f"{process.st:.2f}",
                             'qty_plan': last_line.qty_plan,
 
                             'start_time': start_time,
@@ -279,8 +279,8 @@ def get_arr_history(selected_plan):
                             'shift_work': last_line.shift_work,
                             'department': last_line.department.name,
                             'line': last_line.line.name,
-                            'model_group': model.group.description,
-                            'model_name': model.description,
+                            'model_name': process.model.description,
+                            'process_name': process.description,
                             'st_plan': '0.00',
                             'qty_plan': 0,
 
@@ -297,19 +297,19 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
     arr = []
     if plan:
         # Get all model in group model of this plan
-        selected_group = DJProcess.objects.filter(group__description=plan.group_model,
+        selected_group = DJProcess.objects.filter(model__description=plan.model,
                                                 department__name=plan.department)
         day = datetime.fromtimestamp(plan.timestamp).strftime(
             '%Y-%m-%d')
         # Calculate for all model in selected group
-        for model in selected_group:
+        for process in selected_group:
             write_obj = WriteData.objects.filter(date=day, department__name=plan.department,
-                                                 line__name=plan.line, model=model,
+                                                 line__name=plan.line, process=process,
                                                  qty_plan=plan.qty_plan, version=plan.version)
             if write_obj:
                 last_line = write_obj.last()
                 latest_obj = LatestData.objects.filter(date=last_line.date, department=last_line.department,
-                                                       line=last_line.line, model=last_line.model,
+                                                       line=last_line.line, process=last_line.process,
                                                        qty_plan=last_line.qty_plan, version=last_line.version).last()
                 data = []
                 if latest_obj:
@@ -322,11 +322,11 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                         # Get previous qty_actual
                         current_line = (WriteData.objects.filter(qty_actual=last_line.qty_actual, date=last_line.date,
                                                                  department__name=last_line.department, line__name=last_line.line,
-                                                                 model__name=last_line.model.name, version=last_line.version,
+                                                                 process__name=last_line.process.name, version=last_line.version,
                                                                  qty_plan=last_line.qty_plan)).first()
                         _previous_line = (WriteData.objects.filter(qty_actual=current_line.qty_actual - 1, date=current_line.date,
                                                                    department__name=current_line.department, line__name=current_line.line,
-                                                                   model__name=current_line.model.name, version=current_line.version,
+                                                                   process__name=current_line.process.name, version=current_line.version,
                                                                    qty_plan=current_line.qty_plan)).first()
                         if _previous_line:
                             previous_line = _previous_line
@@ -357,7 +357,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                                                 machine=last_line.machine, material=last_line.material, quality=last_line.quality,
                                                 other=last_line.other, date=last_line.date, version=last_line.version,
                                                 shift_work=last_line.shift_work, qty_plan=last_line.qty_plan, department=last_line.department,
-                                                line=last_line.line, model=last_line.model)
+                                                line=last_line.line, process=last_line.process)
                             new_data.save()
 
                             # If data change => update st_actual
@@ -377,11 +377,11 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                             'shift_work': last_line.shift_work,
                             'department': last_line.department.name,
                             'line': last_line.line.name,
-                            'count_model_in_group': len(selected_group),
-                            'model_group': model.group.description,
-                            'model_name': model.description,
-                            'model_order': model.order,
-                            'st_plan': f"{model.st:.2f}",
+                            'count_process_in_model': len(selected_group),
+                            'model_name': process.model.description,
+                            'process_name': process.description,
+                            'process_order': process.order,
+                            'st_plan': f"{process.st:.2f}",
                             'qty_plan': last_line.qty_plan,
 
                             'start_time': start_time,
@@ -404,10 +404,10 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                             'shift_work': last_line.shift_work,
                             'department': last_line.department.name,
                             'line': last_line.line.name,
-                            'count_model_in_group': len(selected_group),
-                            'model_group': model.group.description,
-                            'model_name': model.description,
-                            'model_order': model.order,
+                            'count_process_in_model': len(selected_group),
+                            'model_name': process.model.description,
+                            'process_name': process.description,
+                            'process_order': process.order,
                             'st_plan': '0.00',
                             'qty_plan': 0,
 
@@ -423,7 +423,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
                                           machine=last_line.machine, material=last_line.material, quality=last_line.quality,
                                           other=last_line.other, date=last_line.date, version=last_line.version,
                                           shift_work=last_line.shift_work, qty_plan=last_line.qty_plan, department=last_line.department,
-                                          line=last_line.line, model=last_line.model)
+                                          line=last_line.line, process=last_line.process)
                     new_data.save()
 
                 arr.append(data)
@@ -432,8 +432,8 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
 
 def home(request):
     title = 'View'
-    now_datetime = timezone.now().strftime(
-        '%Y-%m-%d 00:00:00.000000+00:00')
+    # now_datetime = timezone.now().strftime(
+    #     '%Y-%m-%d 00:00:00.000000+00:00')
     my_date = datetime.fromtimestamp(
         datetime.timestamp(timezone.now())).strftime('%Y-%m-%d')
 
@@ -619,13 +619,13 @@ def planning(request):
             if department and line and dj_model and plan != '' and version != '':
                 # Check plan exists in database
                 plan_exists = Planning.objects.filter(date=my_date, department=department,
-                                                      line=line, group_model=dj_model,
+                                                      line=line, model=dj_model,
                                                       version=version, shift_work=shift_work,
                                                       qty_plan=plan)
 
                 if not plan_exists:
                     my_plan = Planning(timestamp=my_timestamp, date=my_date, time=my_time,
-                                       department=department, line=line, group_model=dj_model,
+                                       department=department, line=line, model=dj_model,
                                        version=version, shift_work=shift_work, qty_plan=plan)
                     my_plan.save()
 
@@ -1060,7 +1060,7 @@ def check_plan(request):
             if department and line and dj_model and plan != '' and version != '':
                 # Check plan exists in database
                 plan_exists = Planning.objects.filter(date=my_date, department=department,
-                                                      line=line, group_model=dj_model,
+                                                      line=line, model=dj_model,
                                                       version=version, shift_work=shift_work,
                                                       qty_plan=plan)
 
@@ -1099,16 +1099,16 @@ def check_plan(request):
 def test_input(request, pk_plan):
     title = 'Test Input'
     current_timestamp = datetime.timestamp(timezone.now())
-    current_date = datetime.fromtimestamp(current_timestamp)
-    current_date_str = current_date.strftime('%Y-%m-%d')
+    # current_date = datetime.fromtimestamp(current_timestamp)
+    # current_date_str = current_date.strftime('%Y-%m-%d')
 
     departments = Department.objects.all()
     lines = Line.objects.all()
     dj_models = DJModel.objects.all()
 
     my_plan = Planning.objects.get(id=pk_plan)
-    my_models = DJProcess.objects.filter(
-        department__name=my_plan.department, group__description=my_plan.group_model)
+    my_processes = DJProcess.objects.filter(
+        department__name=my_plan.department, model__description=my_plan.model)
 
     if request.method == 'POST':
         start = False
@@ -1124,11 +1124,11 @@ def test_input(request, pk_plan):
         qty_plan = my_plan.qty_plan
         department = Department.objects.get(name=my_plan.department)
         line = Line.objects.get(name=my_plan.line)
-        model_id = request.POST['btn-model-id']
+        process_id = request.POST['btn-process-id']
 
         # Check exists
         exists_data = WriteData.objects.filter(date=date, department=department,
-                                               line=line, model_id=model_id,
+                                               line=line, process_id=process_id,
                                                version=version, shift_work=shift_work,
                                                qty_plan=qty_plan).last()
         if exists_data:
@@ -1144,11 +1144,11 @@ def test_input(request, pk_plan):
                                  other=other, date=date, version=version,
                                  shift_work=shift_work, qty_plan=qty_plan,
                                  department=department, line=line,
-                                 model_id=model_id)
+                                 process_id=process_id)
             new_data.save()
 
             exists_data = WriteData.objects.get(date=date, department=department,
-                                                line=line, model_id=model_id,
+                                                line=line, process_id=process_id,
                                                 version=version, shift_work=shift_work,
                                                 qty_plan=qty_plan)
 
@@ -1174,9 +1174,9 @@ def test_input(request, pk_plan):
                              other=other, date=date, version=version,
                              shift_work=shift_work, qty_plan=qty_plan,
                              department=department, line=line,
-                             model_id=model_id)
+                             process_id=process_id)
         # print(qty_actual, timestamp, other, quality, material, machine, start,
-        #       date, version, shift_work, qty_plan, department, line, model_id)
+        #       date, version, shift_work, qty_plan, department, line, process_id)
         new_data.save()
 
     context = {
@@ -1186,7 +1186,7 @@ def test_input(request, pk_plan):
         'lines': lines,
         'dj_models': dj_models,
         'my_plan': my_plan,
-        'my_models': my_models,
+        'my_processes': my_processes,
     }
 
     return render(request, 'write/test-input.html', context=context)
