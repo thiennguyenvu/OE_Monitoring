@@ -6,7 +6,7 @@
     {% for idx, val in dict_ass_b.items %}
     <div class="model-box">
         <div class="model-tag-name" id="model-{{val.department}}-{{val.line}}-{{idx}}">
-            <b>{{ val.model_name }}</b>
+            <b>{{ val.process_name }}</b>
             {% if val.st_actual != '0.00' %}
             <div>{{val.st_actual}}</div>
             <script>
