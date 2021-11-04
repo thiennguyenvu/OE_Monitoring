@@ -16,7 +16,7 @@ from dj_data.models import *
 
 
 # Create your views here.
-brand = 'DONGJIN VIETNAM'
+brand = 'DONGJIN VIETNAM J.S.C'
 
 
 def calc_delta(delta_second, shift_3rd, begin_time, end_time):
@@ -74,7 +74,7 @@ def get_arr_group_model(today_plan):
     arr = []
     if today_plan:
         # Get today group model
-        selected_group = DJModel.objects.filter(group__description=today_plan.group_model,
+        selected_group = DJProcess.objects.filter(group__description=today_plan.group_model,
                                                 department__name=today_plan.department)
         day = datetime.fromtimestamp(today_plan.timestamp).strftime(
             '%Y-%m-%d')
@@ -173,7 +173,7 @@ def get_arr_plan(today_plan):
     arr = []
     if today_plan:
         # Get today group model
-        selected_group = DJModel.objects.filter(group__description=today_plan.group_model,
+        selected_group = DJProcess.objects.filter(group__description=today_plan.group_model,
                                                 department__name=today_plan.department)
 
         for i in range(0, len(selected_group)):
@@ -213,7 +213,7 @@ def get_arr_history(selected_plan):
         # Get all plan of selected date
         for plan in selected_plan:
             # Get all model in group model of this plan
-            selected_group = DJModel.objects.filter(group__description=plan.group_model,
+            selected_group = DJProcess.objects.filter(group__description=plan.group_model,
                                                     department__name=plan.department)
 
             day = datetime.fromtimestamp(plan.timestamp).strftime(
@@ -297,7 +297,7 @@ def get_arr_last_model(plan):  # Get latest data (calculate st with previous st)
     arr = []
     if plan:
         # Get all model in group model of this plan
-        selected_group = DJModel.objects.filter(group__description=plan.group_model,
+        selected_group = DJProcess.objects.filter(group__description=plan.group_model,
                                                 department__name=plan.department)
         day = datetime.fromtimestamp(plan.timestamp).strftime(
             '%Y-%m-%d')
@@ -571,8 +571,7 @@ def planning(request):
 
     departments = Department.objects.all()
     lines = Line.objects.all()
-    # dj_models = DJModel.objects.all()
-    dj_group_models = DJGroupModel.objects.all()
+    dj_models = DJModel.objects.all()
 
     submit_data = []
 
@@ -598,10 +597,10 @@ def planning(request):
             if line:
                 line = request.POST['line']
 
-            dj_group_model = DJGroupModel.objects.filter(
-                description=request.POST['dj_group_model'])
-            if dj_group_model:
-                dj_group_model = request.POST['dj_group_model']
+            dj_model = DJModel.objects.filter(
+                description=request.POST['dj_model'])
+            if dj_model:
+                dj_model = request.POST['dj_model']
 
             plan = ''
             if str(request.POST['plan']).isnumeric():
@@ -617,16 +616,16 @@ def planning(request):
             if 'check-shift' in request.POST:
                 shift_work = 1
 
-            if department and line and dj_group_model and plan != '' and version != '':
+            if department and line and dj_model and plan != '' and version != '':
                 # Check plan exists in database
                 plan_exists = Planning.objects.filter(date=my_date, department=department,
-                                                      line=line, group_model=dj_group_model,
+                                                      line=line, group_model=dj_model,
                                                       version=version, shift_work=shift_work,
                                                       qty_plan=plan)
 
                 if not plan_exists:
                     my_plan = Planning(timestamp=my_timestamp, date=my_date, time=my_time,
-                                       department=department, line=line, group_model=dj_group_model,
+                                       department=department, line=line, group_model=dj_model,
                                        version=version, shift_work=shift_work, qty_plan=plan)
                     my_plan.save()
 
@@ -636,7 +635,7 @@ def planning(request):
                     li.safe.info{{margin-left:5px;}}</style><table><thead>\
                     <th>Department</th><th>Line</th><th>Model</th><th>Plan</th>\
                     <th>Version</th><th>3rd Shift</th></thead><tbody><tr>\
-                    <td>{department}</td><td>{line}</td><td>{dj_group_model}</td>\
+                    <td>{department}</td><td>{line}</td><td>{dj_model}</td>\
                     <td>{plan}</td><td>{version}</td><td>{shift_work}</td>\
                     </tr></tbody></table>"
                     messages.add_message(request, messages.INFO,
@@ -722,8 +721,7 @@ def planning(request):
         'title': title,
         'departments': departments,
         'lines': lines,
-        # 'dj_models': dj_models,
-        'dj_group_models': dj_group_models,
+        'dj_models': dj_models,
     }
 
     return render(request, 'write/planning.html', context=context)
@@ -1014,7 +1012,7 @@ def check_plan(request):
 
     departments = Department.objects.all()
     lines = Line.objects.all()
-    dj_group_models = DJGroupModel.objects.all()
+    dj_models = DJModel.objects.all()
 
     my_plan = ''
 
@@ -1040,10 +1038,10 @@ def check_plan(request):
             if line:
                 line = request.POST['line']
 
-            dj_group_model = DJGroupModel.objects.filter(
-                description=request.POST['dj_group_model'])
-            if dj_group_model:
-                dj_group_model = request.POST['dj_group_model']
+            dj_model = DJModel.objects.filter(
+                description=request.POST['dj_model'])
+            if dj_model:
+                dj_model = request.POST['dj_model']
 
             plan = ''
             if str(request.POST['plan']).isnumeric():
@@ -1059,10 +1057,10 @@ def check_plan(request):
             if 'check-shift' in request.POST:
                 shift_work = 1
 
-            if department and line and dj_group_model and plan != '' and version != '':
+            if department and line and dj_model and plan != '' and version != '':
                 # Check plan exists in database
                 plan_exists = Planning.objects.filter(date=my_date, department=department,
-                                                      line=line, group_model=dj_group_model,
+                                                      line=line, group_model=dj_model,
                                                       version=version, shift_work=shift_work,
                                                       qty_plan=plan)
 
@@ -1077,7 +1075,7 @@ def check_plan(request):
                     li.safe.info{{margin-left:5px;}}</style><table><thead>\
                     <th>Department</th><th>Line</th><th>Model</th><th>Plan</th>\
                     <th>Version</th><th>3rd Shift</th></thead><tbody><tr>\
-                    <td>{department}</td><td>{line}</td><td>{dj_group_model}</td>\
+                    <td>{department}</td><td>{line}</td><td>{dj_model}</td>\
                     <td>{plan}</td><td>{version}</td><td>{shift_work}</td>\
                     </tr></tbody></table>"
                     messages.add_message(request, messages.INFO,
@@ -1091,7 +1089,7 @@ def check_plan(request):
         'title': title,
         'departments': departments,
         'lines': lines,
-        'dj_group_models': dj_group_models,
+        'dj_models': dj_models,
         'my_plan': my_plan,
     }
 
@@ -1106,10 +1104,10 @@ def test_input(request, pk_plan):
 
     departments = Department.objects.all()
     lines = Line.objects.all()
-    dj_group_models = DJGroupModel.objects.all()
+    dj_models = DJModel.objects.all()
 
     my_plan = Planning.objects.get(id=pk_plan)
-    my_models = DJModel.objects.filter(
+    my_models = DJProcess.objects.filter(
         department__name=my_plan.department, group__description=my_plan.group_model)
 
     if request.method == 'POST':
@@ -1186,7 +1184,7 @@ def test_input(request, pk_plan):
         'title': title,
         'departments': departments,
         'lines': lines,
-        'dj_group_models': dj_group_models,
+        'dj_models': dj_models,
         'my_plan': my_plan,
         'my_models': my_models,
     }
