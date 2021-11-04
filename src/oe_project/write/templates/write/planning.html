@@ -32,10 +32,10 @@
                             {% endfor %}
                         </select>
                         <br />
-                        <label for="id_dj_group_model">Model: </label>
-                        <select id="id_dj_group_model" name="dj_group_model" required>
+                        <label for="id_dj_model">Model: </label>
+                        <select id="id_dj_model" name="dj_model" required>
                             <option value="" class="opt-empty"></option>
-                            {% for item in dj_group_models %}
+                            {% for item in dj_models %}
                             <option value="{{ item.description }}">{{ item.description }}</option>
                             {% endfor %}
                         </select>
