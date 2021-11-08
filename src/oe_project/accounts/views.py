@@ -49,7 +49,7 @@ def loginPage(request):
 
 def logoutPage(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')
 
 
 @login_required(login_url='login')
