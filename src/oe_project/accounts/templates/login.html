@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login</title>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="DONGJIN VIETNAM">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}" type="text/css" media="all">
+    <link rel="stylesheet" href="{% static 'fontawesome-5.15.2/css/all.css' %}">
+</head>
+
+<body>
+    <div id="right-sidebar" class="right-sidebar-notifcations nav-collapse">
+        <div class="bs-example bs-example-tabs right-sidebar-tab-notification" data-example-id="togglable-tabs">
+            <div class="right-sidebar-panel-content animated fadeInRight" tabindex="5003"
+                style="overflow: hidden; outline: none;">
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <section class="main">
+        <div class="layer">
+            <!---728x90--->
+
+            <div class="bottom-grid">
+                <div class="logo">
+                    <a href="">
+
+                    </a>
+                </div>
+                <!-- <div class="links">
+                        <ul class="links-unordered-list">
+                            <li class="active">
+                                <a href="#" class="">About Us</a>
+                            </li>
+                            <li class="">
+                                <a href="#" class="">Register</a>
+                            </li>
+                            <li class="">
+                                <a href="#" class="">Contact</a>
+                            </li>
+                        </ul>
+                    </div> -->
+            </div>
+            <div class="content-form">
+                <div class="text-center icon">
+                    <img id="dj-logo" src="{% static 'images/logo.png' %}" alt="">
+                </div>
+                <!---728x90--->
+                <div class="content-bottom">
+                    <form method="POST" autocomplete="off">
+                        {% csrf_token %}
+                        <div class="field-group">
+                            <span class="fa fa-user" aria-hidden="true"></span>
+                            <div class="wthree-field">
+                                <input name="username" id="username" type="text" value="" placeholder="Username"
+                                    value="{{ user.get_username }}" required>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <span class="fa fa-lock" aria-hidden="true"></span>
+                            <div class="wthree-field">
+                                <input name="password" id="password" type="Password" placeholder="Password" required>
+                            </div>
+                        </div>
+                        {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                        <div class="wthree-field">
+                            <button type="submit" class="btn">Get Started</button>
+                        </div>
+                        <ul class="list-login">
+                            <li class="switch-agileits">
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider round"></span>
+                                    keep Logged in
+                                </label>
+                            </li>
+                            <li>
+                                <a href="#" class="text-right">forgot password?</a>
+                            </li>
+                            <li class="clearfix"></li>
+                        </ul>
+                        <ul class="list-login-bottom">
+                            <li class="">
+                                <a href="#" class=""></a>
+                            </li>
+                            <li class="">
+                                <a href="#" class="text-right"></a>
+                            </li>
+                            <li class="clearfix"></li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+            <!---728x90--->
+            <div class="bottom-grid1">
+                <div class="links">
+                    <ul class="links-unordered-list">
+                        <li class="">
+                            <a href="#" class="">About Us</a>
+                        </li>
+                        <li class="">
+                            <a href="#" class="">Contact</a>
+                        </li>
+                        <li class="">
+                            <a href="#" class="">Privacy Policy</a>
+                        </li>
+                        <li class="">
+                            <a href="#" class="">Terms of Use</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="copyright">
+                    <p>© 2021 DONGJIN VIETNAM J.S.C All rights reserved | Design by
+                        <a href="#">Thiên</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="{% static 'js/jquery-3.4.1.js' %}"></script>
+    <script>
+        jQuery(function($){
+            $('input[id="username"]').focus();
+        })
+    </script>
+</body>
+</html>

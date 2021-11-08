@@ -1,0 +1,67 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% endblock head %}
+{% block body %}
+<h1 style="text-align: center;">{{ title }}</h1>
+<div>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    <div class="frm-change-profile">
+        <form method="POST">
+            {% csrf_token %}
+            <p>
+                <label for="id_first_name">First name:</label>
+                <input type="text" name="first_name" maxlength="30" id="id_first_name" value="{{ request.user.first_name }}">
+            </p>
+            <p>
+                <label for="id_last_name">Last name:</label>
+                <input type="text" name="last_name" maxlength="150" id="id_last_name" value="{{ request.user.last_name }}">
+            </p>
+            <p>
+                <label for="id_email">Email:</label>
+                <input type="email" name="email" maxlength="254" id="id_email" value="{{ request.user.email }}">
+            </p>
+            <p>
+                <label for="id_date_joined">Date joined:</label>
+                <input type="text" name="date_joined" value="{{ request.user.date_joined |date:'Y-m-d H:i:s.u' }}" id="id_date_joined" disabled>
+            </p>
+            <p>
+                <label for="id_last_login">Last login:</label>
+                <input type="text" name="last_login" value="{{ request.user.last_login |date:'Y-m-d H:i:s.u' }}" id="id_last_login" disabled>
+            </p>
+            <input type="submit" name="save-profile" id="save-profile" value="Change Profile">
+        </form>
+    </div>
+    <div>
+        <a id="change-password" href="#">Password Settings</a>
+    </div>
+    <div class="frm-change-password">
+        <form method="POST">
+            {% csrf_token %}
+            {{ password_form.as_p }}
+            <input type="button" id="cancel-change-password" value="Cancel">
+            <input type="submit" name="save-password" id="save-password" value="Change Password">
+        </form>
+    </div>
+</div>
+{% endblock body %}
+{% block script %}
+<script>
+    jQuery(function ($) {
+        $('#change-password').click(function () {
+            $('.frm-change-password').show();
+
+        });
+        $('#cancel-change-password').click(function () {
+            $('.frm-change-password').hide();
+        });
+    });
+</script>
+{% endblock script %}

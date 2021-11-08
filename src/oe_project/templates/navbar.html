@@ -60,21 +60,80 @@
             </li>
         </ul>
         <ul class="navbar-nav w-50">
+            {% if request.user.is_authenticated %}
+            <li class="nav-item ml-auto">
+                <a class="nav-link display-name"
+                    href="{% if request.user.username %}{% url 'profiles' username=request.user.username %}{% endif %}">
+                    {% if request.user.avatar %}
+                    <img intrinsicsize="32x32" class="navbar-profile-img" src="{{ request.user.avatar.url }}">
+                    {% else %}
+                    <img intrinsicsize="32x32" class="navbar-profile-img" src="{% static 'images/default-avatar.png' %}">
+                    {% endif %}
+                    <span class="label">
+                        {% if user.first_name and user.last_name %}
+                        <b>{{ user.first_name}} {{ user.last_name }}</b>
+                        {% else %}
+                        <b>{{ user }}</b>
+                        {% endif %}
+                    </span>
+                </a>       
+            </li>
             <li class="nav-item dropdown ml-auto">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
                     aria-haspopup="true" aria-expanded="false" aria-label="settings"><i
                         class="fas fa-sliders-h"></i></a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="{% url 'admin:index' %}"><i
-                            class="fas fa-cogs"></i><span class="label">Admin & Settings</span></a>
-                    <a class="dropdown-item" href="{% url 'check_plan' %}"><i class="fas fa-tasks"></i><span class="label">Check Plan</span></a>
-                    <a class="dropdown-item" href="mailto:it@dongjinvietnam.com"><i class="fas fa-comment-dots"></i><span class="label">Give
-                            Feedback/Report a bug</span></a>
+                    <a class="dropdown-item" href="{% url 'profiles' username=request.user.username %}">
+                        <i class="fas fa-id-card"></i>
+                        <span class="label">Profile</span>
+                    </a>
+                    <a class="dropdown-item" href="{% url 'account_settings' username=request.user.username %}">
+                        <i class="fas fa-cogs"></i>
+                        <span class="label">Settings & Privacy</span>
+                    </a>
+                    <a class="dropdown-item" href="{% url 'check_plan' %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="label">Check Plan</span>
+                    </a>
+                    <a class="dropdown-item" href="mailto:it@dongjinvietnam.com">
+                        <i class="fas fa-comment-dots"></i>
+                        <span class="label">Give Feedback/Report a bug</span>
+                    </a>
                     <div class="dropdown-divider"></div>
-                    <div class="dropdown-item"><span
-                            class="label">©Copyright 2021 DONGJIN VIETNAM JSC.</span></div>
+                    <a class="dropdown-item" href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span class="label">Log out</span>
+                    </a>
                 </div>
             </li>
+            {% else %}
+            <li class="nav-item ml-auto">
+                <a class="nav-link display-name" href="{% url 'login' %}">Sign In</a>
+            </li>
+            <li class="nav-item dropdown ml-auto">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false" aria-label="settings"><i
+                        class="fas fa-sliders-h"></i></a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{% url 'planning' %}">
+                        <i class="fas fa-cogs"></i>
+                        <span class="label">Planning</span>
+                    </a>
+                    <a class="dropdown-item" href="{% url 'check_plan' %}">
+                        <i class="fas fa-tasks"></i>
+                        <span class="label">Check Plan</span>
+                    </a>
+                    <a class="dropdown-item" href="mailto:it@dongjinvietnam.com">
+                        <i class="fas fa-comment-dots"></i>
+                        <span class="label">Give Feedback/Report a bug</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item">
+                        <span class="label">©Copyright 2021 DONGJIN VIETNAM JSC.</span>
+                    </div>
+                </div>
+            </li>
+            {% endif %}  
         </ul>
     </div>
 </nav>
