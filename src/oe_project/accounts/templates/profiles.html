@@ -1,0 +1,76 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock head %}
+{% block body %}
+<div>
+    <div class="profile-head">
+        <div class="profile-avatar">
+            {% if request.user.avatar %}
+            <img class="user-avatar" src="{{ request.user.avatar.url }}" alt="">
+            {% else %}
+            <img class="user-avatar" src="{% static 'images/default-avatar.png' %}" alt="">
+            {% endif %}
+            <div class="frm-change-avatar">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="id_avatar"><b>Avatar</b></label>
+                    {{ avatar_form.avatar }}
+                    <div>{{ avatar_form.avatar.url }}</div>
+                    <div>
+                        <input type="button" name="cancel-change-avatar" id="cancel-change-avatar" value="Cancel">
+                        <input type="submit" name="btn-change-avatar" id="btn-change-avatar" value="Upload Avatar">
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="profile-name">
+            <span>{{ user.first_name }}</span> <span>{{ user.last_name }}</span>
+        </div>
+        <div class="profile-bio">
+            <div class="content">{{ user.bio }}</div>
+            <div><a class="href-change-bio" href="#">Change Bio</a></div>
+            <div class="frm-change-bio">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ bio_form.bio }}
+                    <div>
+                        <input type="button" name="cancel-change-bio" id="cancel-change-bio" value="Cancel">
+                        <input type="submit" name="btn-change-bio" id="btn-change-bio" value="Save">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="profile-body">
+        {{profile_form}}
+    </div>
+</div>
+
+{% endblock body %}
+{% block script %}
+<script>
+    jQuery(function ($) {
+        $('.href-change-bio').click(function () {
+            $('.frm-change-bio').show();
+            $('.profile-bio .content').hide();
+            $('#id_bio').empty().append('{{ request.user.bio }}').focus();
+            var bio_length = '{{ request.user.bio|length }}';
+            $('#id_bio')[0].setSelectionRange(bio_length, bio_length);
+            $(this).hide();
+        });
+        $('#cancel-change-bio').click(function () {
+            $('.frm-change-bio').hide();
+            $('.href-change-bio').show();
+            $('.profile-bio .content').show();
+        });
+        $('.user-avatar').on('click', function () {
+            $('.frm-change-avatar').show();
+        });
+        $('#cancel-change-avatar').click(function () {
+            $('.frm-change-avatar').hide();
+        });
+    });
+</script>
+{% endblock script %}

@@ -1,15 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.forms import inlineformset_factory, modelformset_factory
 from django.utils import timezone
 from django.conf import settings
 from django.http import JsonResponse
 from django.template.loader import render_to_string
-import pathlib
-import json
+from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta
-from django.core import serializers
-from django.db.models import Q
+import json
 
 from .models import *
 from dj_data.models import *
@@ -563,7 +560,7 @@ def home(request):
 
     return render(request, 'write/home.html', context=context)
 
-
+@login_required(login_url='login')
 def planning(request):
     title = 'Planning'
     path = f"{settings.BASE_DIR}/static/json/"
@@ -1007,6 +1004,7 @@ def chart(request):
     return render(request, 'write/chart.html', context=context)
 
 
+@login_required(login_url='login')
 def check_plan(request):
     title = 'Check Plan'
 
@@ -1096,6 +1094,7 @@ def check_plan(request):
     return render(request, 'write/check-plan.html', context=context)
 
 
+@login_required(login_url='login')
 def test_input(request, pk_plan):
     title = 'Test Input'
     current_timestamp = datetime.timestamp(timezone.now())
