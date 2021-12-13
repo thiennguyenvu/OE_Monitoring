@@ -37,7 +37,7 @@ class Planning(models.Model):
 class LatestData(models.Model):
     start = models.BooleanField(default=False)
     qty_actual = models.PositiveIntegerField()
-    timestamps = models.FloatField()
+    timestamps = models.FloatField(unique=True)
     machine = models.BooleanField(default=True)
     material = models.BooleanField(default=True)
     quality = models.BooleanField(default=True)
